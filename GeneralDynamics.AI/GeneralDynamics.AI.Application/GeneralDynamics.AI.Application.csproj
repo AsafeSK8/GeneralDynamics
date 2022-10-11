@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeneralDynamics.AI.Data\GeneralDynamics.AI.Data.csproj" />
+    <ProjectReference Include="..\GeneralDynamics.AI.Transversal\GeneralDynamics.AI.Transversal.csproj" />
+  </ItemGroup>
+
+</Project>
