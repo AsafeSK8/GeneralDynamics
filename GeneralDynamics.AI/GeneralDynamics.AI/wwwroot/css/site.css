@@ -48,3 +48,28 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.center {
+    margin: auto;
+    width: 40%;
+    padding: 10px;
+}
+
+.login-btn {
+    margin-top: 10px;
+    width: -webkit-fill-available;
+}
+
+.centerMiddle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -moz-transform: translate(-50%, -50%); /* Firefox */
+    -ms-transform: translate(-50%, -50%); /* IE 9 */
+    -webkit-transform: translate(-50%, -50%); /* Safari and Chrome*/
+    -o-transform: translate(-50%, -50%); /* Opera */
+    transform: translate(-50%, -50%);
+    /* optional size in px or %: */
+    width: 100px;
+    height: 100px;
+}

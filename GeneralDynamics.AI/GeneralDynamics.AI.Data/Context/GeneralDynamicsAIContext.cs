@@ -40,10 +40,6 @@ namespace GeneralDynamics.AI.Data.Context
                 entity.Property(e => e.Description)
                     .IsRequired()
                     .HasColumnName("Description");
-
-                //entity.HasMany(e => e.Users)
-                //.WithOne(d => d.Role)
-                //.HasConstraintName("FK_User_Role");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -88,10 +84,6 @@ namespace GeneralDynamics.AI.Data.Context
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_User_Role");
-
-                //entity.HasOne(p => p.Role)
-                //.WithMany(b => b.Users)
-                //.HasConstraintName("FK_User_Role");
             });
 
         }
