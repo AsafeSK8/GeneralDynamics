@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralDynamics.AI.Transver
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralDynamics.AI.Application", "GeneralDynamics.AI.Application\GeneralDynamics.AI.Application.csproj", "{9F1287B7-A54C-4D8B-999B-A3FC1EED9959}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralDynamics.AI.Model", "GeneralDynamics.AI.Model\GeneralDynamics.AI.Model.csproj", "{FC42BE9C-5699-4801-8298-156FC8BD9A3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{9F1287B7-A54C-4D8B-999B-A3FC1EED9959}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F1287B7-A54C-4D8B-999B-A3FC1EED9959}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F1287B7-A54C-4D8B-999B-A3FC1EED9959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC42BE9C-5699-4801-8298-156FC8BD9A3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC42BE9C-5699-4801-8298-156FC8BD9A3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC42BE9C-5699-4801-8298-156FC8BD9A3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC42BE9C-5699-4801-8298-156FC8BD9A3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

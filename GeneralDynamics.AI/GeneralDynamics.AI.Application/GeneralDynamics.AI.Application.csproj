@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GeneralDynamics.AI.Data\GeneralDynamics.AI.Data.csproj" />
+    <ProjectReference Include="..\GeneralDynamics.AI.Model\GeneralDynamics.AI.Model.csproj" />
     <ProjectReference Include="..\GeneralDynamics.AI.Transversal\GeneralDynamics.AI.Transversal.csproj" />
   </ItemGroup>
 

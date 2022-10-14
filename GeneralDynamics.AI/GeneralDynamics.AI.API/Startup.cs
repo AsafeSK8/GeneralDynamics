@@ -1,4 +1,4 @@
-using GeneralDynamics.AI.Data;
+﻿using GeneralDynamics.AI.Data;
 using GeneralDynamics.AI.Data.Context;
 using GeneralDynamics.AI.Data.Repository;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +13,10 @@ using GeneralDynamics.AI.Application.Services;
 using GeneralDynamics.AI.Transversal.Factorias;
 using System.Reflection;
 using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GeneralDynamics.AI.API
 {
@@ -28,15 +32,27 @@ namespace GeneralDynamics.AI.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                });
 
+            services.AddMvc();
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GeneralDynamics.AI.API", Version = "v1" });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
-
-            services.AddScoped<IRepository<Role>, Repository<Role>>();
 
             services.AddDbContext<GeneralDynamicsAIContext>(opt =>
             {
@@ -44,16 +60,8 @@ namespace GeneralDynamics.AI.API
             });
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.StartsWith("GeneralDynamics")).ToArray();
-
             FactoryManager.ConfigureFactories(services);
-
             services.AddGeneralDynamicsAIConfig();
-
-            //services.AddDbContext<GeneralDynamicsAIContext>();
-            //var sqlConnectionConfiguration = new SqlConfiguration(Configuration.GetConnectionString("SqlConnection"));
-            //services.AddSingleton(sqlConnectionConfiguration);
-            
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,16 +75,14 @@ namespace GeneralDynamics.AI.API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseStaticFiles();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
         }
     }
 }

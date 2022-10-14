@@ -1,11 +1,15 @@
 ﻿using GeneralDynamics.AI.Application.Services;
 using GeneralDynamics.AI.Data;
 using GeneralDynamics.AI.Data.Repository;
+using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Transversal.Factorias;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI.API.Controllers
@@ -29,12 +33,21 @@ namespace GeneralDynamics.AI.API.Controllers
             _userService = FactoryManager.GetInstance<IUserService>();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var data = await _userService.GetAllUsers();
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllUsers()
+        //{
+        //    var data = await _userService.GetAllUsers();
 
-            return Ok(data);
+        //    return Ok(data);
+        //}
+        
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetAllUsers()
+        {
+            var currentUser = GetCurrentUser();
+
+            return Ok(currentUser);
         }
 
         [HttpGet("{id}")]
@@ -90,9 +103,6 @@ namespace GeneralDynamics.AI.API.Controllers
         // [Route("roles")]
         public async Task<IActionResult> RemoveUser(int id)
         {
-            //if (id == null)
-            //    return BadRequest();
-
             if (id <= 0)
             {
                 ModelState.AddModelError("User", "User shouldn't be empty");
@@ -124,6 +134,27 @@ namespace GeneralDynamics.AI.API.Controllers
             var data = await _userService.RemoveUsers(ids);
 
             return Ok(data);
+        }
+
+        private UserDTO GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+
+            if(identity != null)
+            {
+                var userClaims = identity.Claims;
+
+                return new UserDTO
+                {
+                    UserName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email)?.Value,
+                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
+                    LastName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
+                    role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                };
+            }
+
+            return null;
         }
 
 

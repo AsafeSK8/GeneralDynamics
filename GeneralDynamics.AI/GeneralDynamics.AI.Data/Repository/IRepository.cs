@@ -11,7 +11,8 @@ namespace GeneralDynamics.AI.Data.Repository
     {
         Task<TEntity> Get(int id);
         Task<IEnumerable<TEntity>> GetAll();
-        Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate = null);
+        Task<TEntity> FindOne(Expression<Func<TEntity, bool>> predicate = null);
 
         Task Add(TEntity entity);
         Task AddRange(IEnumerable<TEntity> entities);

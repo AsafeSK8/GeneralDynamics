@@ -38,9 +38,16 @@ namespace GeneralDynamics.AI.Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate = null)
         {
-            return (IEnumerable<TEntity>)await EntitySet.FindAsync(predicate);
+            var userList =  (IEnumerable<TEntity>)await EntitySet.ToListAsync();
+
+            return userList.Where(predicate.Compile());
+        }
+
+        public async Task<TEntity> FindOne(Expression<Func<TEntity, bool>> predicate = null)
+        {
+            return (TEntity)await EntitySet.FirstOrDefaultAsync(predicate);
         }
 
         public async Task<TEntity> Get(int id)
