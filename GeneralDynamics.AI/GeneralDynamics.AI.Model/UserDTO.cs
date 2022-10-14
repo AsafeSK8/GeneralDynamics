@@ -14,6 +14,6 @@ namespace GeneralDynamics.AI.Model
         public string Token { get; set; }
         public int? RoleId { get; set; }
 
-        public string role { get; set; }
+        public string Role { get; set; }
     }
 }

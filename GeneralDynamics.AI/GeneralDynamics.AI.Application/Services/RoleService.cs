@@ -130,7 +130,7 @@ namespace GeneralDynamics.AI.Application.Services
 
             try
             {
-                var data = await _repository.Get(id);
+                var data = await _repository.GetById(id);
 
                 if(data != null)
                 {
@@ -164,7 +164,7 @@ namespace GeneralDynamics.AI.Application.Services
                     return resultado;
                 }
 
-                var role = await _repository.Get(id);
+                var role = await _repository.GetById(id);
 
                 if (role != null)
                 {

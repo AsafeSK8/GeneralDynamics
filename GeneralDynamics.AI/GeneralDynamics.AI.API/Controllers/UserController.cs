@@ -33,16 +33,16 @@ namespace GeneralDynamics.AI.API.Controllers
             _userService = FactoryManager.GetInstance<IUserService>();
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllUsers()
-        //{
-        //    var data = await _userService.GetAllUsers();
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsersTwo()
+        {
+            var data = await _userService.GetAllUsers();
 
-        //    return Ok(data);
-        //}
-        
+            return Ok(data);
+        }
+
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "ADM, USER")]
         public IActionResult GetAllUsers()
         {
             var currentUser = GetCurrentUser();
@@ -150,7 +150,7 @@ namespace GeneralDynamics.AI.API.Controllers
                     Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email)?.Value,
                     Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
                     LastName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
-                    role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
                 };
             }
 

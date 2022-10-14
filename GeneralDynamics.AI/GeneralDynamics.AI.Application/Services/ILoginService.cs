@@ -13,5 +13,7 @@ namespace GeneralDynamics.AI.Application.Services
     {
         Task<Resultado<UserDTO>> Authenticate(UserLogin userLogin);
         public Resultado<string> GenerateToken(UserDTO user, IConfiguration config);
+
+        public Task<Resultado> SaveToken(UserDTO userDto, string token);
     }
 }

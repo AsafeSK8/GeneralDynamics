@@ -36,11 +36,12 @@ namespace GeneralDynamics.AI.Application.Services
             try
             {
 
-                var data = await _repository.FindOne(expr);
+                //var data = await _repository.FindOne(expr);
+                var data = await _repository.Get(expr, includeProperties: "Role");
 
-                if (data != null)
+                if (data.Any())
                 {
-                    resultado.Respuesta = FactoryManager.Map<User, UserDTO>(data);
+                    resultado.Respuesta = FactoryManager.Map<User, UserDTO>(data.FirstOrDefault());
                 }
                 else
                 {
@@ -72,13 +73,13 @@ namespace GeneralDynamics.AI.Application.Services
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.GivenName, user.Name),
                 new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
                 var token = new JwtSecurityToken(config["Jwt:Issuer"],
                     config["Jwt:Audience"],
                     claims,
-                    expires: DateTime.Now.AddDays(1),
+                    expires: DateTime.Now.AddMinutes(5),
                     signingCredentials: credentials);
 
                 resultado.Respuesta = new JwtSecurityTokenHandler().WriteToken(token);
@@ -91,6 +92,25 @@ namespace GeneralDynamics.AI.Application.Services
 
             return resultado;
 
+        }
+
+        public async Task<Resultado> SaveToken(UserDTO userDto, string token)
+        {
+            Resultado resultado = new Resultado(true);
+
+            try
+            {
+                var user = await _repository.GetById(userDto.Id);
+                user.Token = token;
+                await _repository.Update(user);
+            }
+            catch (Exception e)
+            {
+                resultado.ResultadoOperacion = false;
+                resultado.Mensaje = e.Message;
+            }
+
+            return resultado;
         }
     }
 }

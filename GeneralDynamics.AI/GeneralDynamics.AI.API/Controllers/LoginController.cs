@@ -32,9 +32,10 @@ namespace GeneralDynamics.AI.API.Controllers
 
             var data = await _loginService.Authenticate(userLogin);
 
-            if(data != null)
+            if(data.ResultadoOperacion)
             {
                 var token = _loginService.GenerateToken(data.Respuesta, _config);
+                await _loginService.SaveToken(data.Respuesta, token.Respuesta);
                 return Ok(token);
             }
 

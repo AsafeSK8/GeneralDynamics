@@ -13,6 +13,8 @@ namespace GeneralDynamics.AI.Data.Repository
 
         protected readonly GeneralDynamicsAIContext _context;
 
+        // public abstract Task<IEnumerable<TEntity>> Get(Expression<Func<TEntity, bool>> filter = null, Func<System.Linq.IQueryable<TEntity>, System.Linq.IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null);
+
         public Repository(GeneralDynamicsAIContext context)
         {
             _context = context;
@@ -38,6 +40,12 @@ namespace GeneralDynamics.AI.Data.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task Update(TEntity entity)
+        {
+            EntitySet.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate = null)
         {
             var userList =  (IEnumerable<TEntity>)await EntitySet.ToListAsync();
@@ -50,7 +58,7 @@ namespace GeneralDynamics.AI.Data.Repository
             return (TEntity)await EntitySet.FirstOrDefaultAsync(predicate);
         }
 
-        public async Task<TEntity> Get(int id)
+        public async Task<TEntity> GetById(int id)
         {
             return await EntitySet.FindAsync(id);
         }
@@ -70,6 +78,36 @@ namespace GeneralDynamics.AI.Data.Repository
         {
             EntitySet.RemoveRange(entities);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<TEntity>> Get(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = null)
+        {
+            IQueryable<TEntity> query = await GetQuery(filter, orderBy, includeProperties);
+            return query;
+        }
+
+        protected virtual async Task<IQueryable<TEntity>> GetQuery(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "")
+        {
+            IQueryable<TEntity> query = EntitySet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (!String.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty.Trim());
+                }
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+            return query;
         }
 
         #region IDisposable Support
@@ -109,41 +147,4 @@ namespace GeneralDynamics.AI.Data.Repository
         #endregion
     }
 
-    //public class RCopy
-    //{
-    //    public void Add(TEntity entity)
-    //    {
-    //        Context.Set<TEntity>().Add(entity);
-    //    }
-
-    //    public void AddRange(IEnumerable<TEntity> entities)
-    //    {
-    //        Context.Set<TEntity>().AddRange(entities);
-    //    }
-
-    //    public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
-    //    {
-    //        return Context.Set<TEntity>().Where(predicate);
-    //    }
-
-    //    public TEntity Get(int id)
-    //    {
-    //        return Context.Set<TEntity>().Find(id);
-    //    }
-
-    //    public IEnumerable<TEntity> GetAll()
-    //    {
-    //        return Context.Set<TEntity>().ToList();
-    //    }
-
-    //    public void Remove(TEntity entity)
-    //    {
-    //        Context.Set<TEntity>().Remove(entity);
-    //    }
-
-    //    public void RemoveRange(IEnumerable<TEntity> entities)
-    //    {
-    //        Context.Set<TEntity>().RemoveRange(entities);
-    //    }
-    //}
 }

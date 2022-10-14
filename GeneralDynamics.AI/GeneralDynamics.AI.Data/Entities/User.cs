@@ -5,6 +5,12 @@ namespace GeneralDynamics.AI.Data
     
     public partial class User
     {
+
+        public User()
+        {
+            //this.Role = new Role();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
@@ -14,7 +20,6 @@ namespace GeneralDynamics.AI.Data
         public string Password { get; set; }
         public string Token { get; set; }
         public int? RoleId { get; set; }
-    
         public virtual Role Role { get; set; }
     }
 }
