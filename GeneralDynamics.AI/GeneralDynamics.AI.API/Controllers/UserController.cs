@@ -20,6 +20,7 @@ namespace GeneralDynamics.AI.API.Controllers
 
         private readonly IRepository<User> _repository;
         private IUserService _userService = null;
+        private ISessionService _sessionService = null;
 
         [NonAction]
         public IActionResult Index()
@@ -31,6 +32,7 @@ namespace GeneralDynamics.AI.API.Controllers
         {
             _repository = repository;
             _userService = FactoryManager.GetInstance<IUserService>();
+            _sessionService = FactoryManager.GetInstance<ISessionService>();
         }
 
         [HttpGet("all")]
@@ -45,7 +47,7 @@ namespace GeneralDynamics.AI.API.Controllers
         [Authorize(Roles = "ADM, USER")]
         public IActionResult GetAllUsers()
         {
-            var currentUser = GetCurrentUser();
+            var currentUser = _sessionService.GetCurrentUser(HttpContext);
 
             return Ok(currentUser);
         }
@@ -135,28 +137,6 @@ namespace GeneralDynamics.AI.API.Controllers
 
             return Ok(data);
         }
-
-        private UserDTO GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-            if(identity != null)
-            {
-                var userClaims = identity.Claims;
-
-                return new UserDTO
-                {
-                    UserName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value,
-                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email)?.Value,
-                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
-                    LastName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
-                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
-                };
-            }
-
-            return null;
-        }
-
 
     }
 }

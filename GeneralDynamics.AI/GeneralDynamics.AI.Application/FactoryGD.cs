@@ -25,7 +25,7 @@ namespace GeneralDynamics.AI.Application
         {
             FactoryManager.AddMappingProfile(typeof(AutoMapperProfileGD));
 
-            services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<ISessionService, SessionService>();
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUserService, UserService>();
 

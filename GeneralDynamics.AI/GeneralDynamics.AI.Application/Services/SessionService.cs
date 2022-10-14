@@ -3,6 +3,7 @@ using GeneralDynamics.AI.Data.Repository;
 using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Transversal.Factorias;
 using GeneralDynamics.AI.Transversal.Mensajes;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -16,12 +17,12 @@ using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI.Application.Services
 {
-    public class LoginService : ILoginService
+    public class SessionService : ISessionService
     {
         private IConfiguration _config;
         private readonly IRepository<User> _repository;
 
-        public LoginService(IRepository<User> repository, IConfiguration config)
+        public SessionService(IRepository<User> repository, IConfiguration config)
         {
             _repository = repository;
             _config = config;
@@ -83,6 +84,7 @@ namespace GeneralDynamics.AI.Application.Services
                     signingCredentials: credentials);
 
                 resultado.Respuesta = new JwtSecurityTokenHandler().WriteToken(token);
+
             }
             catch (Exception e)
             {
@@ -111,6 +113,71 @@ namespace GeneralDynamics.AI.Application.Services
             }
 
             return resultado;
+        }
+
+        public UserDTO GetCurrentUser(HttpContext context)
+        {
+            var identity = GetUserIdentity(context);
+
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+
+                return new UserDTO
+                {
+                    UserName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value,
+                    Email = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Email)?.Value,
+                    Name = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.GivenName)?.Value,
+                    LastName = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Surname)?.Value,
+                    Role = userClaims.FirstOrDefault(o => o.Type == ClaimTypes.Role)?.Value
+                };
+            }
+
+            return null;
+        }
+
+        public async Task<Resultado> LogOut(HttpContext context)
+        {
+
+            Resultado resultado = new Resultado(true);
+
+            try
+            {
+                // TODO Limpiar Cookies y caché del navegador
+
+                var identity = GetUserIdentity(context);
+
+                string username = identity.Claims.FirstOrDefault(o => o.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                if (!String.IsNullOrEmpty(username))
+                {
+                    var userSet = await _repository.Get(x => x.UserName == username);
+
+                    var user = userSet.FirstOrDefault();
+
+                    user.Token = "";
+
+                    await _repository.Update(user);
+                }
+                else
+                {
+                    resultado.ResultadoOperacion = false;
+                    resultado.Mensaje = "Error: No se encotró el usuario";
+                }
+
+            }
+            catch (Exception e)
+            {
+                resultado.ResultadoOperacion = false;
+                resultado.Mensaje = e.Message;
+            }
+
+            return resultado;
+        }
+
+        private ClaimsIdentity GetUserIdentity(HttpContext context)
+        {
+            return context.User.Identity as ClaimsIdentity;
         }
     }
 }

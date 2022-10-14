@@ -14,15 +14,15 @@ namespace GeneralDynamics.AI.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class SessionController : ControllerBase
     {
         private IConfiguration _config;
-        private ILoginService _loginService = null;
+        private ISessionService _sessionService = null;
 
-        public LoginController(IConfiguration config)
+        public SessionController(IConfiguration config)
         {
             _config = config;
-            _loginService = FactoryManager.GetInstance<ILoginService>();
+            _sessionService = FactoryManager.GetInstance<ISessionService>();
         }
 
         [AllowAnonymous]
@@ -30,14 +30,23 @@ namespace GeneralDynamics.AI.API.Controllers
         public async Task<IActionResult> Login([FromBody] UserLogin userLogin)
         {
 
-            var data = await _loginService.Authenticate(userLogin);
+            var data = await _sessionService.Authenticate(userLogin);
 
             if(data.ResultadoOperacion)
             {
-                var token = _loginService.GenerateToken(data.Respuesta, _config);
-                await _loginService.SaveToken(data.Respuesta, token.Respuesta);
+                var token = _sessionService.GenerateToken(data.Respuesta, _config);
+                await _sessionService.SaveToken(data.Respuesta, token.Respuesta);
                 return Ok(token);
             }
+
+            return Ok(data);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> LogOut()
+        {
+            var data = await _sessionService.LogOut(HttpContext);
 
             return Ok(data);
         }
