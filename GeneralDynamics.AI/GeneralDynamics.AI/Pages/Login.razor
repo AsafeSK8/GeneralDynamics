@@ -1,34 +1,63 @@
 ﻿@layout LoginLayout
 @page "/"
+@using GeneralDynamics.AI.Model
+@inject NavigationManager NavigationManager
 
 
 <BSCard CardType="CardType.Card" style="width: 25rem;" class="center">
     <BSCard CardType="CardType.Image" src="Images/login.jpg" alt="Card image cap" asp-append-version="true" />
     <BSCard CardType="CardType.Body">
-        <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
-        <BSCard CardType="CardType.Text">
 
-            <form>
+        <BSForm Model="userlogin" IsRow="true" Gutters="Gutters.Medium" OnSubmit="login">
+            <DataAnnotationsValidator />
 
-                <fieldset>
+            <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
+            <BSCard CardType="CardType.Text">
 
-                    <div class="form-group">
-                        <label class="col-form-label mt-4" for="inputDefault">User Name</label>
-                        <input type="text" class="form-control" placeholder="User Name" id="inputDefault">
-                    </div>
+                <BSCol Position="Position.Relative" ColumnMedium="12">
+                    @_message
+                    <BSValidationSummary />
+                </BSCol>
 
-                    <div class="form-group">
-                        <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                    </div>
-                </fieldset>
+                <BSCol Position="Position.Relative" ColumnMedium="12">
+                    <BSLabel>Username</BSLabel>
+                    <BSInput InputType="InputType.Text" @bind-Value="userlogin.Username" ValidateOnInput="true" />
+                    <BSFeedback For="@(() => userlogin.Username)" ValidMessage="" />
+                </BSCol>
 
-            </form>
+                <BSCol Position="Position.Relative" ColumnMedium="12">
+                    <BSLabel>Password</BSLabel>
+                    <BSInput InputType="InputType.Text" @bind-Value="userlogin.Password" ValidateOnInput="true" />
+                    <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
+                </BSCol>
 
-        </BSCard>
-        <BSButton Color="BSColor.Primary" Class="login-btn">Login</BSButton>
-        <BSButton Color="BSColor.Info" Class="login-btn">Sign in</BSButton>
+            </BSCard>
+
+            <BSButton Color="BSColor.Primary" IsSubmit="true" Class="login-btn">Login</BSButton>
+            <BSButton Color="BSColor.Info" Class="login-btn" OnClick="signIn">Sign in</BSButton>
+
+        </BSForm>
+
     </BSCard>
 </BSCard>
 
-@code { }
+@code { 
+
+    UserLogin userlogin = new UserLogin();
+    private string _message = "";
+
+    private void login(EditContext e)
+    {
+        if (e.Validate())
+        {
+            // Do login
+            _message = "Submitted to database";
+        }
+    }
+
+    private void signIn()
+    {
+        NavigationManager.NavigateTo("/signIn");
+    }
+
+}
