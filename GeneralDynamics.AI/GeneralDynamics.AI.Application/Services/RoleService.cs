@@ -26,6 +26,17 @@ namespace GeneralDynamics.AI.Application.Services
             {
                 if (role != null)
                 {
+                    // Comprobamos si existe rol con el mismo código, en el caso de que si cancelamos la operación
+                    var existingRol = await _repository.Get(x => x.Code == role.Code);
+
+                    if (existingRol.Any())
+                    {
+                        resultado.ResultadoOperacion = false;
+                        resultado.Mensaje = "Rol Code Already Exists";
+
+                        return resultado;
+                    }
+
                     await _repository.Add(role);
                 }
                 else
