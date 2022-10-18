@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI.Services.Generic
 {
-    public class GenericService
+    public class GenericService : IGenericService
     {
 
         private readonly HttpClient _httpClient;
@@ -21,12 +22,28 @@ namespace GeneralDynamics.AI.Services.Generic
             _localStorageService = localStorageService;
         }
 
-        public async Task<T> GetAll<T>(string path)
+        #region Main Methods
+
+        public async Task<T> Get<T>(string path)
         {
             var token = await GetToken();
             HttpRequestMessage request = GenerateRequestWithAuthorization(HttpMethod.Get, path, token);
-            return await sendAndReceiveParsedObject<T>(request);
+            return await ReceiveParsedObject<T>(request);
         }
+
+        public async Task<T> Post<T>(string path, object obj)
+        {
+            var token = await GetToken();
+            HttpRequestMessage request = GenerateRequestWithAuthorization(HttpMethod.Post, path, token);
+            return await sendAndReceiveParsedObject<T>(request, obj);
+
+        }
+
+        #endregion
+
+
+
+        #region Auxiliary Methods
 
         private async Task<string> GetToken()
         {
@@ -41,12 +58,23 @@ namespace GeneralDynamics.AI.Services.Generic
             return requestMessage;
         }
 
-        private async Task<T> sendAndReceiveParsedObject<T>(HttpRequestMessage requestMessage)
+        private async Task<T> ReceiveParsedObject<T>(HttpRequestMessage requestMessage)
         {
             var request = await _httpClient.SendAsync(requestMessage);
             var requestBody = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             return JsonConvert.DeserializeObject<T>(requestBody);
         }
+
+        private async Task<T> sendAndReceiveParsedObject<T>(HttpRequestMessage requestMessage, object obj)
+        {
+            requestMessage.Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(obj),Encoding.UTF8, "application/json");
+            var request = await _httpClient.SendAsync(requestMessage);
+            var requestBody = request.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            return JsonConvert.DeserializeObject<T>(requestBody);
+        }
+
+        #endregion
+
 
         #region IDisposable Support
         private bool disposedValue = false; // Para detectar llamadas redundantes

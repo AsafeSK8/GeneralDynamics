@@ -11,5 +11,6 @@ namespace GeneralDynamics.AI.Services
     public interface IUserService
     {
         Task<Resultado<IEnumerable<User>>> GetAllUsers();
+        Task<Resultado<User>> GetUserById(int id);
     }
 }

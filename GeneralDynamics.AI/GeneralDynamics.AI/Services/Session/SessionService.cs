@@ -1,4 +1,5 @@
 ﻿using GeneralDynamics.AI.Model;
+using GeneralDynamics.AI.Services.Generic;
 using GeneralDynamics.AI.Transversal.Mensajes;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,12 @@ namespace GeneralDynamics.AI.Services
     {
 
         private readonly HttpClient _httpClient;
+        private IGenericService _genericService;
 
-        public SessionService(HttpClient httpClient)
+        public SessionService(HttpClient httpClient, IGenericService genericService)
         {
             _httpClient = httpClient;
+            _genericService = genericService;
         }
 
         public async Task<Resultado<string>> Login(UserLogin userLogin)
@@ -30,6 +33,19 @@ namespace GeneralDynamics.AI.Services
             var response = await _httpClient.PostAsync("api/session", userLoginJson);
 
             return await response.Content.ReadFromJsonAsync<Resultado<string>>();
+
+            //var resultado = new Resultado<string>(true);
+            //try
+            //{
+            //    resultado = await _genericService.Post<Resultado<string>>("api/login", userLogin);
+            //}
+            //catch (Exception e)
+            //{
+            //    resultado.ResultadoOperacion = false;
+            //    resultado.Mensaje = e.Message;
+            //}
+
+            //return resultado;
 
         }
 
