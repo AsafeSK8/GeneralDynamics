@@ -1,12 +1,5 @@
 ﻿@layout LoginLayout
-@page "/"
-@using GeneralDynamics.AI.Model
-@using GeneralDynamics.AI.Data
-@using GeneralDynamics.AI.Services
-@inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ISessionService SessionService
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@page "/login"
 
 
 <BSCard CardType="CardType.Card" style="width: 25rem;" class="center">
@@ -73,7 +66,7 @@
                 await localStorage.SetItemAsync("token", token);
 
                 ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
-                NavigationManager.NavigateTo("/index");
+                NavigationManager.NavigateTo("/");
 
             }
             catch (Exception ex)

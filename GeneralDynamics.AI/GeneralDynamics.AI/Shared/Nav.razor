@@ -1,4 +1,7 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+﻿
+@using GeneralDynamics.AI.Data
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,13 +36,29 @@
                 </li>
             </ul>
             <form class="d-flex">
-                <input class="form-control me-sm-2" type="text" placeholder="Search">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                <AuthorizeView>
+                    <Authorized>
+                        <button class="btn btn-secondary my-2 my-sm-0" @onclick="Logout" type="submit">Logout</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <button class="btn btn-secondary my-2 my-sm-0" @onclick="NavigateToLogin" type="submit">Login</button>
+                    </NotAuthorized>
+                </AuthorizeView>
+
             </form>
         </div>
     </div>
 </nav>
 
 @code {
+    public void Logout()
+    {
+        ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        NavigateToLogin();
+    }
 
+    public void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/");
+    }
 }

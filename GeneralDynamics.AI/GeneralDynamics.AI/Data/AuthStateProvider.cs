@@ -44,8 +44,6 @@ namespace GeneralDynamics.AI.Data
                 identity = new ClaimsIdentity();
             }
 
-
-
             ClaimsPrincipal user = new ClaimsPrincipal(identity);
 
             return await Task.FromResult(new AuthenticationState(user));
@@ -72,6 +70,17 @@ namespace GeneralDynamics.AI.Data
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
 
+        }
+
+        public void MarkUserAsLoggedOut()
+        {
+            _localStorageService.RemoveItemAsync("token");
+
+            ClaimsIdentity identity = new ClaimsIdentity();
+
+            ClaimsPrincipal user = new ClaimsPrincipal(identity);
+
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
 
         public JwtSecurityToken DecodeToken(string token)
