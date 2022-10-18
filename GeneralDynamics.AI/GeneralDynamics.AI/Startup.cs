@@ -1,7 +1,11 @@
+using Blazored.LocalStorage;
 using BlazorStrap;
+using GeneralDynamics.AI.Data;
+using GeneralDynamics.AI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +36,10 @@ namespace GeneralDynamics.AI
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazorStrap();
+            services.AddBlazoredLocalStorage();
+            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            services.AddHttpClient<ISessionService, SessionService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +60,9 @@ namespace GeneralDynamics.AI
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
