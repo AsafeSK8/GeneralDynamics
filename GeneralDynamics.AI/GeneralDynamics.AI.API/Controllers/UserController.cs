@@ -36,6 +36,7 @@ namespace GeneralDynamics.AI.API.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize]
         public async Task<IActionResult> GetAllUsersTwo()
         {
             var data = await _userService.GetAllUsers();

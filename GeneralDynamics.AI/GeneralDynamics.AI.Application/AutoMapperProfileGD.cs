@@ -25,6 +25,7 @@ namespace GeneralDynamics.AI.Application
                 .ForMember(x => x.UserName, x => x.MapFrom(y => y.UserName))
                 .ForMember(x => x.RoleId, x => x.MapFrom(y => y.RoleId))
                 .ForMember(x => x.Role, x => x.MapFrom(y => y.Role.Code));
+                //.ForMember(X => X.RoleDTO, x => x.MapFrom(y => y.Role));
 
             //CreateMap<Seguro, SeguroRenovacionDTO>()
             //    .ForMember(x => x.Id, x => x.MapFrom(y => y.Id))

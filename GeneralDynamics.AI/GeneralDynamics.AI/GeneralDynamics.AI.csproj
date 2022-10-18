@@ -13,10 +13,12 @@
     <PackageReference Include="BlazorStrap" Version="5.0.106" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.17" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.23.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.23.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GeneralDynamics.AI.Data\GeneralDynamics.AI.Data.csproj" />
     <ProjectReference Include="..\GeneralDynamics.AI.Model\GeneralDynamics.AI.Model.csproj" />
     <ProjectReference Include="..\GeneralDynamics.AI.Transversal\GeneralDynamics.AI.Transversal.csproj" />
   </ItemGroup>
