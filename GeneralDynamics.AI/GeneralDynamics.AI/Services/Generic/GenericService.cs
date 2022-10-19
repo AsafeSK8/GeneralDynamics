@@ -31,7 +31,7 @@ namespace GeneralDynamics.AI.Services.Generic
             return await ReceiveParsedObject<T>(request);
         }
 
-        public async Task<T> Post<T>(string path, object obj)
+        public async Task<T> Post<T>(string path, object obj = null)
         {
             var token = await GetToken();
             HttpRequestMessage request = GenerateRequestWithAuthorization(HttpMethod.Post, path, token);

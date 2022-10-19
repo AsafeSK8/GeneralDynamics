@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
+using GeneralDynamics.AI.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -12,36 +14,38 @@ namespace GeneralDynamics.AI.Data
     public class AuthStateProvider : AuthenticationStateProvider
     {
         private ILocalStorageService _localStorageService;
+        private ITokenManagerService _tokenManagerService;
 
-        public AuthStateProvider(ILocalStorageService localStorageService)
+        public AuthStateProvider(ILocalStorageService localStorageService, ITokenManagerService tokenManagerService)
         {
             _localStorageService = localStorageService;
+            _tokenManagerService = tokenManagerService;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            ClaimsIdentity identity;
-            string token = await _localStorageService.GetItemAsync<string>("token");
+            ClaimsIdentity identity = new ClaimsIdentity();
+            JwtSecurityToken jwtToken = await _tokenManagerService.GetJwtSecurityToken("token");
 
-            if (!string.IsNullOrEmpty(token))
+            if (jwtToken != null)
             {
-                JwtSecurityToken jwtToken = DecodeToken(token);
 
-                string userc = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                if (await _tokenManagerService.IsCurrentTokenValid("token"))
+                {
+                    identity = new ClaimsIdentity(new[]
+                    { 
+                    // As the token is already provided by the server, we only need to store the username and rol for the other actions
+                    // Ya que el token los provee el servidor, sólo necesitamos almacenar el nombre de usuario y rol para las demás acciones
+                    new Claim(ClaimTypes.NameIdentifier, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value),
+                    new Claim(ClaimTypes.Role, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.Role).Value),
+                    }, "apiauth_type");
 
-                identity = new ClaimsIdentity(new[]
-                { 
-                // Ya que el token los provee el servidor, sólo necesitamos almacenar el nombre de usuario y rol para las demás acciones
-                new Claim(ClaimTypes.NameIdentifier, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value),
-                //new Claim(ClaimTypes.Email, jwtToken.Claims.First(claim => claim.Type == "email").Value),
-                new Claim(ClaimTypes.Role, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.Role).Value),
-                //new Claim(ClaimTypes.Name, jwtToken.Claims.First(claim => claim.Type == "name").Value),
-                //new Claim(ClaimTypes.Surname, jwtToken.Claims.First(claim => claim.Type == "lastname").Value)
-            }, "apiauth_type");
-            }
-            else
-            {
-                identity = new ClaimsIdentity();
+                }
+                else
+                {
+                    await _tokenManagerService.RemoveToken("token");
+                }
+
             }
 
             ClaimsPrincipal user = new ClaimsPrincipal(identity);
@@ -50,20 +54,15 @@ namespace GeneralDynamics.AI.Data
         }
 
 
-        public void MarkUserAsAuthenticated(string token)
+        public async Task MarkUserAsAuthenticated(string key)
         {
-            JwtSecurityToken jwtToken = DecodeToken(token);
-
-            string userc = jwtToken.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            JwtSecurityToken jwtToken = await _tokenManagerService.GetJwtSecurityToken(key);
 
             ClaimsIdentity identity = new ClaimsIdentity(new[]
             { 
                 // Ya que el token los provee el servidor, sólo necesitamos almacenar el nombre de usuario y rol para las demás acciones
                 new Claim(ClaimTypes.NameIdentifier, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value),
-                //new Claim(ClaimTypes.Email, jwtToken.Claims.First(claim => claim.Type == "email").Value),
                 new Claim(ClaimTypes.Role, jwtToken.Claims.First(claim => claim.Type == ClaimTypes.Role).Value),
-                //new Claim(ClaimTypes.Name, jwtToken.Claims.First(claim => claim.Type == "name").Value),
-                //new Claim(ClaimTypes.Surname, jwtToken.Claims.First(claim => claim.Type == "lastname").Value)
             }, "apiauth_type");
 
             ClaimsPrincipal user = new ClaimsPrincipal(identity);
@@ -81,14 +80,6 @@ namespace GeneralDynamics.AI.Data
             ClaimsPrincipal user = new ClaimsPrincipal(identity);
 
             NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
-        }
-
-        public JwtSecurityToken DecodeToken(string token)
-        {
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken jwtSecurityToken = handler.ReadJwtToken(token);
-
-            return jwtSecurityToken;
         }
     }
 }

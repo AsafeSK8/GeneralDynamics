@@ -42,6 +42,7 @@ namespace GeneralDynamics.AI
             services.AddBlazoredLocalStorage();
             services.AddTransient<ValidateHeaderHandler>();
             services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            services.AddHttpClient<ITokenManagerService, TokenManagerService>();
             services.AddHttpClient<ISessionService, SessionService>(
                 client => { client.BaseAddress = new Uri("https://localhost:44319"); });
             services.AddHttpClient<IUserService, UserService>(

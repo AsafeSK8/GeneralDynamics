@@ -1,5 +1,6 @@
 ﻿using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Services.Generic;
+using GeneralDynamics.AI.Services;
 using GeneralDynamics.AI.Transversal.Mensajes;
 using System;
 using System.Collections.Generic;
@@ -14,40 +15,36 @@ namespace GeneralDynamics.AI.Services
 {
     public class SessionService : ISessionService
     {
-
-        private readonly HttpClient _httpClient;
         private IGenericService _genericService;
 
         public SessionService(HttpClient httpClient, IGenericService genericService)
         {
-            _httpClient = httpClient;
             _genericService = genericService;
         }
 
         public async Task<Resultado<string>> Login(UserLogin userLogin)
         {
 
-            var userLoginJson = new StringContent(JsonSerializer.Serialize(userLogin),
-                 Encoding.UTF8, "application/json");
+            var resultado = new Resultado<string>(true);
 
-            var response = await _httpClient.PostAsync("api/session", userLoginJson);
+            try
+            {
+                resultado = await _genericService.Post<Resultado<string>>("api/session", userLogin);
+            }
+            catch (Exception e)
+            {
+                resultado.ResultadoOperacion = false;
+                resultado.Mensaje = e.Message;
+            }
 
-            return await response.Content.ReadFromJsonAsync<Resultado<string>>();
-
-            //var resultado = new Resultado<string>(true);
-            //try
-            //{
-            //    resultado = await _genericService.Post<Resultado<string>>("api/login", userLogin);
-            //}
-            //catch (Exception e)
-            //{
-            //    resultado.ResultadoOperacion = false;
-            //    resultado.Mensaje = e.Message;
-            //}
-
-            //return resultado;
+            return resultado;
 
         }
+
+        //public async Task<bool> SaveToken(string token)
+        //{
+            
+        //}
 
         public Task<Resultado> LogOut()
         {

@@ -47,7 +47,7 @@ namespace GeneralDynamics.AI.Application.Services
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "User not found";
+                    resultado.Mensaje = "Wrong Username or Password";
                 }
             }
             catch (Exception e)

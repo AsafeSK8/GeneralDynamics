@@ -30,7 +30,7 @@
 
                 <BSCol Position="Position.Relative" ColumnMedium="12">
                     <BSLabel>Password</BSLabel>
-                    <BSInput InputType="InputType.Text" @bind-Value="userlogin.Password" ValidateOnInput="true" />
+                    <BSInput InputType="InputType.Password" @bind-Value="userlogin.Password" ValidateOnInput="true" />
                     <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
                 </BSCol>
 
@@ -66,12 +66,20 @@
             try
             {
                 var resultado = await SessionService.Login(userlogin);
-                token = resultado.Respuesta;
 
-                await localStorage.SetItemAsync("token", token);
+                if (resultado.ResultadoOperacion)
+                {
+                    token = resultado.Respuesta;
 
-                ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
-                NavigationManager.NavigateTo("/");
+                    await TokenManagerService.SaveToken("token", token);
+
+                    await ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated("token");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    _message = resultado.Mensaje;
+                }
 
             }
             catch (Exception ex)

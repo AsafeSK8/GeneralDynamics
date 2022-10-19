@@ -1,6 +1,7 @@
 ﻿using GeneralDynamics.AI.Application.Services;
 using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Transversal.Factorias;
+using GeneralDynamics.AI.Transversal.Mensajes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,8 +39,13 @@ namespace GeneralDynamics.AI.API.Controllers
                 await _sessionService.SaveToken(data.Respuesta, token.Respuesta);
                 return Ok(token);
             }
-
-            return Ok(data);
+            else
+            {
+                var res = new Resultado<string>(false);
+                res.Mensaje = data.Mensaje;
+                res.Mensajes = null;
+                return Ok(res);
+            }
         }
 
         [HttpGet]
