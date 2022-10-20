@@ -29,11 +29,22 @@ namespace GeneralDynamics.AI.Application.Services
                     // Comprobamos si existe rol con el mismo código, en el caso de que si cancelamos la operación
                     var existingRol = await _repository.Get(x => x.Code == role.Code);
 
-                    if (existingRol.Any())
+                    if (existingRol.Any() && role.Id <= 0)
                     {
                         resultado.ResultadoOperacion = false;
                         resultado.Mensaje = "Rol Code Already Exists";
 
+                        return resultado;
+                    }
+
+                    var roleToModify = existingRol.FirstOrDefault();
+
+                    if(roleToModify != null && roleToModify.Id > 0)
+                    {
+                        roleToModify.Code = role.Code;
+                        roleToModify.Description = role.Description;
+
+                        await _repository.Update(roleToModify);
                         return resultado;
                     }
 

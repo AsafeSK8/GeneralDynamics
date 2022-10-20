@@ -39,6 +39,13 @@ namespace GeneralDynamics.AI.Services.Generic
 
         }
 
+        public async Task<T> Delete<T>(string path)
+        {
+            var token = await GetToken();
+            HttpRequestMessage request = GenerateRequestWithAuthorization(HttpMethod.Delete, path, token);
+            return await ReceiveParsedObject<T>(request);
+        }
+
         #endregion
 
 

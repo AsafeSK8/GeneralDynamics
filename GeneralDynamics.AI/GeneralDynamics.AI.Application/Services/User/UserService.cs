@@ -47,6 +47,7 @@ namespace GeneralDynamics.AI.Application.Services
                         userToModify.LastName = user.LastName;
                         userToModify.Phone = user.Phone;
                         userToModify.Email = user.Email;
+                        userToModify.RoleId = user.RoleId;
 
                         await _repository.Update(userToModify);
                         return resultado;
@@ -159,7 +160,10 @@ namespace GeneralDynamics.AI.Application.Services
 
             try
             {
-                var data = await _repository.GetById(id);
+                //var data = await _repository.GetById(id);
+
+                var userSet = await _repository.Get(x => x.Id == id, includeProperties: "Role");
+                var data = userSet.FirstOrDefault();
 
                 if (data != null)
                 {

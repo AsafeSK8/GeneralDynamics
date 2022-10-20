@@ -8,11 +8,12 @@ using GeneralDynamics.AI.Data;
 
 namespace GeneralDynamics.AI.Services
 {
-    public interface IUserService
+    public interface IRoleService
     {
-        Task<Resultado<IEnumerable<User>>> GetAllUsers();
-        Task<Resultado<User>> GetUserById(int id);
-        Task<Resultado> AddUser(User user);
-        Task<Resultado> DeleteUser(int id);
+        Task<Resultado<IEnumerable<Role>>> GetAllRoles();
+        Task<Resultado<Role>> GetRoleById(int id);
+        Task<Resultado> AddRole(Role role);
+        Task<Resultado> DeleteRole(int id);
+
     }
 }

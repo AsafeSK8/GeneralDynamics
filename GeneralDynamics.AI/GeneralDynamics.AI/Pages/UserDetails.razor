@@ -2,6 +2,8 @@
 @page "/userdetails/{id:int}"
 @using System.ComponentModel.DataAnnotations
 
+
+
 <BSForm Model="@user" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser" OnReset="Reset">
     <DataAnnotationsValidator />
     <BSCol Position="Position.Relative" ColumnMedium="12">
@@ -38,10 +40,44 @@
         <BSInput InputType="InputType.Password" IsDisabled="disabled" @bind-Value="user.Password" placeholder="Email Address" />
         <BSFeedback For="@(() => user.Password)" ValidMessage="" />
     </BSCol>
-    <BSCol Column="12">
-        <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
-        <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
-    </BSCol>
+
+    <AuthorizeView Roles="ADM">
+        <Authorized>
+            <BSLabel>Role</BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="_value">
+                @foreach (var rolex in roles)
+                {
+                    <option value="@rolex.Id">@rolex.Code</option>
+                }
+            </BSInput>
+        </Authorized>
+    </AuthorizeView>
+
+
+    <AuthorizeView Roles="ADM, MAN">
+        <Authorized>
+            <BSCol Column="12">
+                <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
+                <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
+            </BSCol>
+        </Authorized>
+    </AuthorizeView>
+
+    @{ if (disabled)
+        {
+            <AuthorizeView Roles="ADM">
+                <Authorized>
+                    <BSCol Column="12">
+                        <BSButton Color="BSColor.Primary" IsDisabled="!disabled" @onclick="OpenDeleteModal" >Delete User</BSButton>
+                    </BSCol>
+                </Authorized>
+            </AuthorizeView>
+
+        }
+    }
+
+
+
 </BSForm>
 
 @code {
@@ -51,6 +87,8 @@
     User user = new User();
     private string _message = "";
     bool disabled = false;
+    List<Role> roles = new List<Role>();
+    private int? _value;
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,7 +97,15 @@
             disabled = true;
             var res = await UserService.GetUserById(id);
             user = res.Respuesta;
+            if (user.RoleId != null)
+            {
+                _value = user.RoleId;
+            }
+
         }
+
+        var resRoles = await RoleService.GetAllRoles();
+        roles = resRoles.Respuesta.ToList();
     }
 
     private async Task SaveUser(EditContext e)
@@ -68,12 +114,13 @@
         {
             try
             {
+                user.RoleId = _value;
                 var resultado = await UserService.AddUser(user);
 
                 if (resultado.ResultadoOperacion)
                 {
                     Reset();
-                    _message = "User added successfully";
+                    _message = "User added or updated successfully";
                 }
                 else
                 {
@@ -90,6 +137,29 @@
     public void Reset()
     {
         user = new User();
+    }
+
+    public async Task OpenDeleteModal()
+    {
+        try
+        {
+            var resultado = await UserService.DeleteUser(id);
+
+            if (resultado.ResultadoOperacion)
+            {
+                Reset();
+                _message = "User deleted successfully";
+                NavigationManager.NavigateTo("/userdetails");
+            }
+            else
+            {
+                _message = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = "Something went wrong... " + ex.Message;
+        }
     }
 
 }

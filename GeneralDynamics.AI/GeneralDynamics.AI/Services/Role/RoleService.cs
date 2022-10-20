@@ -9,22 +9,22 @@ using GeneralDynamics.AI.Services.Generic;
 
 namespace GeneralDynamics.AI.Services
 {
-    public class UserService : IUserService
+    public class RoleService : IRoleService
     {
 
         private IGenericService _genericService;
 
-        public UserService(HttpClient httpClient, ILocalStorageService localStorageService, IGenericService genericService)
+        public RoleService(HttpClient httpClient, ILocalStorageService localStorageService, IGenericService genericService)
         {
             _genericService = genericService;
         }
 
-        public async Task<Resultado<IEnumerable<User>>> GetAllUsers()
+        public async Task<Resultado<IEnumerable<Role>>> GetAllRoles()
         {
-            var resultado = new Resultado<IEnumerable<User>>(true);
+            var resultado = new Resultado<IEnumerable<Role>>(true);
             try
             {
-                resultado = await _genericService.Get<Resultado<IEnumerable<User>>>("api/user");
+                resultado = await _genericService.Get<Resultado<IEnumerable<Role>>>("api/role");
             }
             catch (Exception e)
             {
@@ -36,12 +36,12 @@ namespace GeneralDynamics.AI.Services
 
         }
 
-        public async Task<Resultado<User>> GetUserById(int id)
+        public async Task<Resultado<Role>> GetRoleById(int id)
         {
-            var resultado = new Resultado<User>(true);
+            var resultado = new Resultado<Role>(true);
             try
             {
-                resultado = await _genericService.Get<Resultado<User>>($"api/user/{id}");
+                resultado = await _genericService.Get<Resultado<Role>>($"api/role/{id}");
             }
             catch (Exception e)
             {
@@ -52,12 +52,13 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> DeleteUser(int id)
+        public async Task<Resultado> AddRole(Role role)
         {
             var resultado = new Resultado(true);
             try
             {
-                resultado = await _genericService.Delete<Resultado>($"api/user/{id}");
+                resultado = await _genericService.Post<Resultado>($"api/role", role);
+
             }
             catch (Exception e)
             {
@@ -68,13 +69,12 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> AddUser(User user)
+        public async Task<Resultado> DeleteRole(int id)
         {
             var resultado = new Resultado(true);
             try
             {
-                resultado = await _genericService.Post<Resultado>($"api/user", user);
-
+                resultado = await _genericService.Delete<Resultado>($"api/role/{id}");
             }
             catch (Exception e)
             {

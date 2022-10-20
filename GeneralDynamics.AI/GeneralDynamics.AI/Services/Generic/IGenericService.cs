@@ -9,5 +9,6 @@ namespace GeneralDynamics.AI.Services.Generic
     {
         Task<T> Get<T>(string path);
         Task<T> Post<T>(string path, object obj);
+        Task<T> Delete<T>(string path);
     }
 }

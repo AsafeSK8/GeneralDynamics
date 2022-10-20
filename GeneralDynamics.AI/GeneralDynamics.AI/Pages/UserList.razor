@@ -6,9 +6,14 @@
 }
 else
 {
+
     <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
         <Header>
-            <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.Id))"></BSDataTableHead>
+            <AuthorizeView Roles="ADM">
+                <Authorized>
+                    <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.Id))"></BSDataTableHead>
+                </Authorized>
+            </AuthorizeView>
             <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.UserName))" ColumnFilter="true">Username</BSDataTableHead>
             <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.Name))" ColumnFilter="true">Name</BSDataTableHead>
             <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.Email))" ColumnFilter="true">Email</BSDataTableHead>
@@ -17,9 +22,14 @@ else
         </Header>
         <Body>
             <BSDataTableRow>
-                <BSTD @onclick="@(() => EditUser(@item.Id))">
-                    <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
-                </BSTD>
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <BSTD @onclick="@(() => EditUser(@item.Id))">
+                            <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
+                        </BSTD>
+                    </Authorized>
+                </AuthorizeView>
+
                 <BSTD>
                     @item.UserName
                 </BSTD>
@@ -76,7 +86,7 @@ else
                 (q.Email.ToLower().Contains(dataRequest.Filter) && nameof(q.Email) == dataRequest.FilterColumn)
                 ).ToList();
             count = data.Count();
-            return await Task.FromResult((data, count));
+            return await Task.FromResult((data.Skip(dataRequest.Page * 5).Take(5), count));
         }
 
         // TODO Implement pagination

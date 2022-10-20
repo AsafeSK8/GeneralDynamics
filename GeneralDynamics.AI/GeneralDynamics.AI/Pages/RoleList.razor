@@ -1,0 +1,87 @@
+﻿@page "/rolelist"
+
+@if (_model == null)
+{
+    <BSSpinner />
+}
+else
+{
+
+<AuthorizeView Roles="ADM">
+
+    <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
+        <Header>
+            <BSDataTableHead TValue="Role" Sortable="false" Column="@(nameof(Role.Id))"></BSDataTableHead>
+
+            <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Code))" ColumnFilter="true">Code</BSDataTableHead>
+            <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Description))" ColumnFilter="true">Description</BSDataTableHead>
+        </Header>
+        <Body>
+            <BSDataTableRow>
+                <BSTD @onclick="@(() => EditRole(@item.Id))">
+                    <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
+                </BSTD>
+
+                <BSTD>
+                    @item.Code
+                </BSTD>
+                <BSTD>
+                    @item.Description
+                </BSTD>
+            </BSDataTableRow>
+        </Body>
+    </BSDataTable>
+
+</AuthorizeView>
+
+    
+}
+
+@code {
+
+    private readonly int _startPage = 1;
+    private IEnumerable<Role> _model { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            var res = await RoleService.GetAllRoles();
+            _model = res.Respuesta.ToList();
+        }
+        catch (Exception e)
+        {
+            var message = e.Message;
+        }
+    }
+
+    protected void EditRole(int id)
+    {
+        NavigationManager.NavigateTo($"/roledetails/{id}");
+    }
+
+    private async Task<(IEnumerable<Role>, int)> FetchItems(DataRequest dataRequest)
+    {
+        var count = _model.Count();
+        if (dataRequest.FilterColumnProperty != null && dataRequest.Filter != null)
+        {
+            var data = _model.Where(q =>
+                (q.Code.ToLower().Contains(dataRequest.Filter) && nameof(q.Code) == dataRequest.FilterColumn) ||
+                (q.Description.ToLower().Contains(dataRequest.Filter) && nameof(q.Description) == dataRequest.FilterColumn)
+                ).ToList();
+            count = data.Count();
+            return await Task.FromResult((data.Skip(dataRequest.Page * 5).Take(5), count));
+        }
+
+        // TODO Implement pagination
+
+        if (dataRequest.SortColumnProperty != null)
+        {
+            if (dataRequest.Descending)
+                return (_model.OrderByDescending(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
+            return (_model.OrderBy(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
+        }
+        return await Task.FromResult((_model.Skip(dataRequest.Page * 5).Take(5), count));
+    }
+
+}

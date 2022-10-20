@@ -1,0 +1,47 @@
+﻿@page "/userdelete/{id:int}"
+
+
+<BSModal IsCentered="true" DataId="modal5">
+    <Header>Delete user</Header>
+    <Content>Are you sure to delete user: @user.UserName</Content>
+    <Footer Context="modal">
+        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="modal.HideAsync">Close</BSButton>
+        <BSButton Color="BSColor.Primary" @onclick="Delete">Yes</BSButton>
+    </Footer>
+</BSModal>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    User user = new User();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            var res = await UserService.GetUserById(id);
+            user = res.Respuesta;
+        }
+
+    }
+
+    protected async Task Delete()
+    {
+        await UserService.DeleteUser(id);
+
+        NavigateToUserList();
+    }
+
+    public void Cancel()
+    {
+        NavigateToUserList();
+    }
+
+    public void NavigateToUserList()
+    {
+        NavigationManager.NavigateTo("/userlist");
+    }
+
+}

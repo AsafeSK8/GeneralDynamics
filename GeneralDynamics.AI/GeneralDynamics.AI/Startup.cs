@@ -51,6 +51,9 @@ namespace GeneralDynamics.AI
             services.AddHttpClient<IGenericService, GenericService>(
                 client => { client.BaseAddress = new Uri("https://localhost:44319"); })
                 .AddHttpMessageHandler<ValidateHeaderHandler>();
+            services.AddHttpClient<IRoleService, RoleService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); })
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
