@@ -6,7 +6,7 @@
 }
 else
 {
-    <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="20" Context="item">
+    <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
         <Header>
             <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.Id))"></BSDataTableHead>
             <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.UserName))" ColumnFilter="true">Username</BSDataTableHead>
@@ -84,9 +84,9 @@ else
         if (dataRequest.SortColumnProperty != null)
         {
             if (dataRequest.Descending)
-                return (_model.OrderByDescending(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 7).Take(7).ToList(), count);
-            return (_model.OrderBy(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 7).Take(7).ToList(), count);
+                return (_model.OrderByDescending(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
+            return (_model.OrderBy(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
         }
-        return await Task.FromResult((_model.Skip(dataRequest.Page * 7).Take(7), count));
+        return await Task.FromResult((_model.Skip(dataRequest.Page * 5).Take(5), count));
     }
 }

@@ -31,11 +31,24 @@ namespace GeneralDynamics.AI.Application.Services
                     // Comprobamos si existe usuario con el mismo username, en el caso de que si cancelamos la operación
                     var existingUser = await _repository.Get(x => x.UserName == user.UserName);
 
-                    if (existingUser.Any())
+                    if (existingUser.Any() && user.Id <= 0)
                     {
                         resultado.ResultadoOperacion = false;
                         resultado.Mensaje = "Username Already Exists";
 
+                        return resultado;
+                    }
+
+                    var userToModify = existingUser.FirstOrDefault();
+
+                    if(userToModify != null && userToModify.Id > 0)
+                    {
+                        userToModify.Name = user.Name;
+                        userToModify.LastName = user.LastName;
+                        userToModify.Phone = user.Phone;
+                        userToModify.Email = user.Email;
+
+                        await _repository.Update(userToModify);
                         return resultado;
                     }
 

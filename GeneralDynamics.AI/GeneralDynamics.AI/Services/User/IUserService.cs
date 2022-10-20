@@ -12,5 +12,6 @@ namespace GeneralDynamics.AI.Services
     {
         Task<Resultado<IEnumerable<User>>> GetAllUsers();
         Task<Resultado<User>> GetUserById(int id);
+        Task<Resultado> AddUser(User user);
     }
 }

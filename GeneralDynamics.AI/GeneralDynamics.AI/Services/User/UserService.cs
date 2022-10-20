@@ -58,6 +58,7 @@ namespace GeneralDynamics.AI.Services
             try
             {
                 resultado = await _genericService.Post<Resultado>($"api/user", user);
+
             }
             catch (Exception e)
             {
