@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralDynamics.AI.Transver
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralDynamics.AI.Application", "GeneralDynamics.AI.Application\GeneralDynamics.AI.Application.csproj", "{9F1287B7-A54C-4D8B-999B-A3FC1EED9959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneralDynamics.AI.Model", "GeneralDynamics.AI.Model\GeneralDynamics.AI.Model.csproj", "{FC42BE9C-5699-4801-8298-156FC8BD9A3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneralDynamics.AI.Model", "GeneralDynamics.AI.Model\GeneralDynamics.AI.Model.csproj", "{FC42BE9C-5699-4801-8298-156FC8BD9A3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

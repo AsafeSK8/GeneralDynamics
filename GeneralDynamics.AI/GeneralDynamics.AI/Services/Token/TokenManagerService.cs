@@ -66,9 +66,9 @@ namespace GeneralDynamics.AI.Services
             throw new NotImplementedException();
         }
 
-        public Task RemoveToken(string key)
+        public async Task RemoveToken(string key)
         {
-            throw new NotImplementedException();
+            await _localStorageService.RemoveItemAsync(key);
         }
 
         public async Task SaveToken(string key, string token)

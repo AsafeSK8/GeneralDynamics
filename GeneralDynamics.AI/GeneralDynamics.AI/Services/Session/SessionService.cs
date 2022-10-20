@@ -1,14 +1,8 @@
 ﻿using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Services.Generic;
-using GeneralDynamics.AI.Services;
 using GeneralDynamics.AI.Transversal.Mensajes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI.Services

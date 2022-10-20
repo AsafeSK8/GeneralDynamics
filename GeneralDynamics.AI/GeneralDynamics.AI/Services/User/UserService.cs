@@ -24,7 +24,7 @@ namespace GeneralDynamics.AI.Services
             var resultado = new Resultado<IEnumerable<User>>(true);
             try
             {
-                resultado = await _genericService.Get<Resultado<IEnumerable<User>>>("api/user/all");
+                resultado = await _genericService.Get<Resultado<IEnumerable<User>>>("api/user");
             }
             catch (Exception e)
             {
@@ -50,7 +50,22 @@ namespace GeneralDynamics.AI.Services
             }
 
             return resultado;
+        }
 
+        public async Task<Resultado> AddUser(User user)
+        {
+            var resultado = new Resultado(true);
+            try
+            {
+                resultado = await _genericService.Post<Resultado>($"api/user", user);
+            }
+            catch (Exception e)
+            {
+                resultado.ResultadoOperacion = false;
+                resultado.Mensaje = e.Message;
+            }
+
+            return resultado;
         }
     }
 }

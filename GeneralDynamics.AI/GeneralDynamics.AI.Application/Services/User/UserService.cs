@@ -120,11 +120,13 @@ namespace GeneralDynamics.AI.Application.Services
                 if (data.ToList().Count > 0)
                 {
                     resultado.Respuesta = data;
+                    resultado.Mensajes = null;
                 }
                 else
                 {
                     resultado.ResultadoOperacion = false;
                     resultado.Mensaje = "No Users found";
+                    resultado.Mensajes = null;
                 }
 
             }
@@ -132,6 +134,7 @@ namespace GeneralDynamics.AI.Application.Services
             {
                 resultado.ResultadoOperacion = false;
                 resultado.Mensaje = e.Message;
+                resultado.Mensajes = null;
             }
 
             return resultado;

@@ -35,18 +35,19 @@ namespace GeneralDynamics.AI.API.Controllers
             _sessionService = FactoryManager.GetInstance<ISessionService>();
         }
 
-        [HttpGet("all")]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAllUsersTwo()
+        public async Task<IActionResult> GetAllUsers()
         {
             var data = await _userService.GetAllUsers();
 
             return Ok(data);
         }
 
-        [HttpGet]
+        // Authorization test
+        [HttpGet("currentuser")]
         [Authorize(Roles = "ADM, USER")]
-        public IActionResult GetAllUsers()
+        public IActionResult GetCurrentUser()
         {
             var currentUser = _sessionService.GetCurrentUser(HttpContext);
 

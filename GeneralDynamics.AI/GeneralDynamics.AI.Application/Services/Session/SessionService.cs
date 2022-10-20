@@ -80,7 +80,7 @@ namespace GeneralDynamics.AI.Application.Services
                 var token = new JwtSecurityToken(config["Jwt:Issuer"],
                     config["Jwt:Audience"],
                     claims,
-                    expires: DateTime.Now.AddMinutes(5),
+                    expires: DateTime.Now.AddMinutes(30),
                     signingCredentials: credentials);
 
                 resultado.Respuesta = new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,48 +1,57 @@
 ﻿@layout LoginLayout
 @page "/login"
-@using GeneralDynamics.AI
-@using GeneralDynamics.AI.Shared
-@using GeneralDynamics.AI.Model
-@using GeneralDynamics.AI.Data
-@using GeneralDynamics.AI.Services
-@using GeneralDynamics.AI.Transversal.Mensajes;
 
-<BSCard CardType="CardType.Card" style="width: 25rem;" class="center">
-    <BSCard CardType="CardType.Image" src="Images/login.jpg" alt="Card image cap" asp-append-version="true" />
-    <BSCard CardType="CardType.Body">
+<AuthorizeView>
+    <Authorized>
+        @{
+            NavigateToPath("/");
+        }
+    </Authorized>
 
-        <BSForm Model="userlogin" IsRow="true" Gutters="Gutters.Medium" OnSubmit="login">
-            <DataAnnotationsValidator />
+    <NotAuthorized>
 
-            <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
-            <BSCard CardType="CardType.Text">
+        <BSCard CardType="CardType.Card" style="width: 25rem;" class="center">
+            <BSCard CardType="CardType.Image" src="Images/login.jpg" alt="Card image cap" asp-append-version="true" />
+            <BSCard CardType="CardType.Body">
 
-                <BSCol Position="Position.Relative" ColumnMedium="12">
-                    @_message
-                    <BSValidationSummary />
-                </BSCol>
+                <BSForm Model="userlogin" IsRow="true" Gutters="Gutters.Medium" OnSubmit="login">
+                    <DataAnnotationsValidator />
 
-                <BSCol Position="Position.Relative" ColumnMedium="12">
-                    <BSLabel>Username</BSLabel>
-                    <BSInput InputType="InputType.Text" @bind-Value="userlogin.Username" ValidateOnInput="true" />
-                    <BSFeedback For="@(() => userlogin.Username)" ValidMessage="" />
-                </BSCol>
+                    <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
+                    <BSCard CardType="CardType.Text">
 
-                <BSCol Position="Position.Relative" ColumnMedium="12">
-                    <BSLabel>Password</BSLabel>
-                    <BSInput InputType="InputType.Password" @bind-Value="userlogin.Password" ValidateOnInput="true" />
-                    <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
-                </BSCol>
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            @_message
+                            <BSValidationSummary />
+                        </BSCol>
+
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            <BSLabel>Username</BSLabel>
+                            <BSInput InputType="InputType.Text" @bind-Value="userlogin.Username" ValidateOnInput="true" />
+                            <BSFeedback For="@(() => userlogin.Username)" ValidMessage="" />
+                        </BSCol>
+
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            <BSLabel>Password</BSLabel>
+                            <BSInput InputType="InputType.Password" @bind-Value="userlogin.Password" ValidateOnInput="true" />
+                            <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
+                        </BSCol>
+
+                    </BSCard>
+
+                    <BSButton Color="BSColor.Primary" IsSubmit="true" Class="login-btn">Login</BSButton>
+                    <BSButton Color="BSColor.Info" Class="login-btn" OnClick="signIn">Sign in</BSButton>
+
+                </BSForm>
 
             </BSCard>
+        </BSCard>
 
-            <BSButton Color="BSColor.Primary" IsSubmit="true" Class="login-btn">Login</BSButton>
-            <BSButton Color="BSColor.Info" Class="login-btn" OnClick="signIn">Sign in</BSButton>
+    </NotAuthorized>
+    
+</AuthorizeView>
 
-        </BSForm>
 
-    </BSCard>
-</BSCard>
 
 @code {
 
@@ -56,12 +65,15 @@
         return base.OnInitializedAsync();
     }
 
+    private void NavigateToPath(string path)
+    {
+        NavigationManager.NavigateTo(path);
+    }
+
     private async Task login(EditContext e)
     {
         if (e.Validate())
         {
-            // Do login
-            // _message = "Submitted to database";
 
             try
             {

@@ -1,0 +1,75 @@
+﻿@page "/userdetails"
+@page "/userdetails/{id:int}"
+
+<BSForm Model="@user" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser">
+
+    <DataAnnotationsValidator />
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            @_message
+            <BSValidationSummary />
+        </BSCol>
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Name</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="user.Name" ValidateOnInput="true" />
+            <BSFeedback For="@(() => user.Name)" ValidMessage="" />
+        </BSCol>
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Last Name</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="user.LastName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => user.LastName)" ValidMessage="" />
+        </BSCol>
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Email</BSLabel>
+            <BSInput InputType="InputType.Email" @bind-Value="user.Email" ValidateOnInput="true" />
+            <BSFeedback For="@(() => user.Email)" ValidMessage="" />
+        </BSCol>
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Number</BSLabel>
+            <BSInput InputType="InputType.Number" @bind-Value="user.Phone" ValidateOnInput="true" />
+            <BSFeedback For="@(() => user.Phone)" ValidMessage="" />
+        </BSCol>
+
+        <BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Username</BSLabel>
+            <BSInput InputType="InputType.Text" @bind-Value="user.UserName" ValidateOnInput="true" />
+            <BSFeedback For="@(() => user.UserName)" ValidMessage="" />
+        </BSCol>
+
+        @*<BSCol Position="Position.Relative" ColumnMedium="12">
+            <BSLabel>Password</BSLabel>
+            <BSInput InputType="InputType.Password" @bind-Value="userlogin.Password" ValidateOnInput="true" />
+            <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
+        </BSCol>*@
+
+    <BSButton Color="BSColor.Primary" IsSubmit="true" Class="login-btn">Save</BSButton>
+
+</BSForm>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    User user = new User();
+
+    private string _message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(id > 0)
+        {
+            var test = await UserService.GetUserById(id);
+        }
+    }
+
+    private void SaveUser()
+    {
+        
+    }
+
+}

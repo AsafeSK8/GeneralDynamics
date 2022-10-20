@@ -16,8 +16,6 @@
             software like Aldus PageMaker including versions of Lorem Ipsum.
         </p>
 
-        <button class="btn btn-secondary my-2 my-sm-0" @onclick="GetAllUsers" type="submit">Get all users test</button>
-
     </Authorized>
     <NotAuthorized>
         <p>Denied!!</p>
@@ -32,9 +30,8 @@
         return base.OnInitializedAsync();
     }
 
-    private async Task GetAllUsers()
+    private void NavigateTo(string path)
     {
-        var result = await UserService.GetAllUsers();
-        var x = result;
+
     }
 }
