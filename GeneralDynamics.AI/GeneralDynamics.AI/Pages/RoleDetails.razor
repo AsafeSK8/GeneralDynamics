@@ -1,12 +1,11 @@
 ﻿@page "/roledetails"
 @page "/roledetails/{id:int}"
+@inject IBlazorStrap _blazorStrap
 
-<BSForm Model="@role" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser" OnReset="Reset">
+<BSToaster />
+
+<BSForm Model="@role" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveRole" OnReset="Reset">
     <DataAnnotationsValidator />
-    <BSCol Position="Position.Relative" ColumnMedium="12">
-        @_message
-        <BSValidationSummary />
-    </BSCol>
     <BSCol Position="Position.Relative" ColumnMedium="4">
         <BSLabel>Code</BSLabel>
         <BSInput InputType="InputType.Text" @bind-Value="role.Code" ValidateOnInput="true" />
@@ -57,6 +56,11 @@
     private int? _value;
     private string deleteMessage;
 
+    // Toast parameters
+    private Toast ToastPlacement { get; set; } = Toast.TopRight;
+    private BSColor Color { get; set; }
+    private int Time { get; set; } = 3000;
+
     protected override async Task OnInitializedAsync()
     {
         if (id > 0)
@@ -75,7 +79,7 @@
         roles = resRoles.Respuesta.ToList();
     }
 
-    private async Task SaveUser(EditContext e)
+    private async Task SaveRole(EditContext e)
     {
         if (e.Validate())
         {
@@ -87,6 +91,7 @@
                 {
                     Reset();
                     _message = "Role added or updated successfully";
+                    ShowToast();
                     disabled = false;
                     NavigationManager.NavigateTo("/roledetails");
                 }
@@ -117,6 +122,7 @@
             {
                 Reset();
                 _message = "Role deleted successfully";
+                ShowToast();
                 NavigationManager.NavigateTo("/roledetails");
             }
             else
@@ -137,6 +143,16 @@
             await DeleteRole();
         }
         StateHasChanged();
+    }
+
+    private void ShowToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
     }
 
 

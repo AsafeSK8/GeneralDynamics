@@ -2,8 +2,9 @@
 @page "/userdetails/{id:int}"
 @using System.ComponentModel.DataAnnotations
 @using GeneralDynamics.AI.Pages
+@inject IBlazorStrap _blazorStrap
 
-
+<BSToaster />
 
 <BSForm Model="@user" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser" OnReset="Reset">
     <DataAnnotationsValidator />
@@ -96,6 +97,11 @@
     private int? _value;
     private string deleteMessage;
 
+    // Toast parameters
+    private Toast ToastPlacement { get; set; } = Toast.TopRight;
+    private BSColor Color { get; set; }
+    private int Time { get; set; } = 3000;
+
     protected override async Task OnInitializedAsync()
     {
         if (id > 0)
@@ -127,6 +133,7 @@
                 {
                     Reset();
                     _message = "User added or updated successfully";
+                    ShowToast();
                     disabled = false;
                     NavigationManager.NavigateTo("/userdetails");
                 }
@@ -157,6 +164,7 @@
             {
                 Reset();
                 _message = "User deleted successfully";
+                ShowToast();
                 NavigationManager.NavigateTo("/userdetails");
             }
             else
@@ -177,6 +185,16 @@
             await DeleteUser();
         }
         StateHasChanged();
+    }
+
+    private void ShowToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
     }
 
 }
