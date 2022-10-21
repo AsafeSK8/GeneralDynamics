@@ -46,7 +46,7 @@ else
     {
         try
         {
-            var res = await RoleService.GetAllRoles();
+            var res = await RoleService.GetAll();
             _model = res.Respuesta.ToList();
         }
         catch (Exception e)

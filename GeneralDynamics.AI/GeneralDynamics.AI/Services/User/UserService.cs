@@ -19,7 +19,7 @@ namespace GeneralDynamics.AI.Services
             _genericService = genericService;
         }
 
-        public async Task<Resultado<IEnumerable<User>>> GetAllUsers()
+        public async Task<Resultado<IEnumerable<User>>> GetAll()
         {
             var resultado = new Resultado<IEnumerable<User>>(true);
             try
@@ -36,7 +36,7 @@ namespace GeneralDynamics.AI.Services
 
         }
 
-        public async Task<Resultado<User>> GetUserById(int id)
+        public async Task<Resultado<User>> GetById(int id)
         {
             var resultado = new Resultado<User>(true);
             try
@@ -52,7 +52,7 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> DeleteUser(int id)
+        public async Task<Resultado> Delete(int id)
         {
             var resultado = new Resultado(true);
             try
@@ -68,7 +68,7 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> AddUser(User user)
+        public async Task<Resultado> Add(User user)
         {
             var resultado = new Resultado(true);
             try

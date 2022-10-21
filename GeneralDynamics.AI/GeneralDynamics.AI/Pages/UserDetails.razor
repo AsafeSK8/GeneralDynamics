@@ -54,32 +54,36 @@
         </Authorized>
     </AuthorizeView>
 
-
-    <AuthorizeView Roles="ADM, MAN">
-        <Authorized>
-            <BSCol Column="12">
+    <BSCol Column="12">
+        <AuthorizeView Roles="ADM, MAN">
+            <Authorized>
                 <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
                 <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
-            </BSCol>
-        </Authorized>
-    </AuthorizeView>
+            </Authorized>
 
-    @{ if (disabled)
-        {
-            deleteMessage = $"Are you sure you want to delete user: {user.UserName}";
-            <AuthorizeView Roles="ADM">
-                <Authorized>
-                    <BSCol Column="12">
-                        <GenericModal Title="Delete User" Text=@deleteMessage ButtonText="Delete" OnClose="OnDeleteDialogClose" IsDisabled="!disabled"></GenericModal>
-                    </BSCol>
-                </Authorized>
-            </AuthorizeView>
+        </AuthorizeView>
+
+        @{ if (disabled)
+            {
+                deleteMessage = $"Are you sure you want to delete user: {user.UserName}";
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <GenericModal Title="Delete User"
+                                      Text=@deleteMessage
+                                      ButtonText="Delete"
+                                      OnClose="OnDeleteDialogClose"
+                                      IsDisabled="!disabled"
+                                      OkButton="Yes"
+                                      CancelButton="No">
+                        </GenericModal>
+                    </Authorized>
+                </AuthorizeView>
+            }
         }
-    }
-
-
-
+    </BSCol>
 </BSForm>
+
+
 
 @code {
 
@@ -97,7 +101,7 @@
         if (id > 0)
         {
             disabled = true;
-            var res = await UserService.GetUserById(id);
+            var res = await UserService.GetById(id);
             user = res.Respuesta;
             if (user.RoleId != null)
             {
@@ -106,7 +110,7 @@
 
         }
 
-        var resRoles = await RoleService.GetAllRoles();
+        var resRoles = await RoleService.GetAll();
         roles = resRoles.Respuesta.ToList();
     }
 
@@ -117,12 +121,14 @@
             try
             {
                 user.RoleId = _value;
-                var resultado = await UserService.AddUser(user);
+                var resultado = await UserService.Add(user);
 
                 if (resultado.ResultadoOperacion)
                 {
                     Reset();
                     _message = "User added or updated successfully";
+                    disabled = false;
+                    NavigationManager.NavigateTo("/userdetails");
                 }
                 else
                 {
@@ -145,7 +151,7 @@
     {
         try
         {
-            var resultado = await UserService.DeleteUser(id);
+            var resultado = await UserService.Delete(id);
 
             if (resultado.ResultadoOperacion)
             {

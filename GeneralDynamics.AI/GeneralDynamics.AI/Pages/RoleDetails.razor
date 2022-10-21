@@ -1,6 +1,5 @@
-﻿@*@page "/userdetails"
-@page "/userdetails/{id:int}"
-@using System.ComponentModel.DataAnnotations
+﻿@page "/roledetails"
+@page "/roledetails/{id:int}"
 
 <BSForm Model="@role" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser" OnReset="Reset">
     <DataAnnotationsValidator />
@@ -9,139 +8,87 @@
         <BSValidationSummary />
     </BSCol>
     <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>First name</BSLabel>
-        <BSInput InputType="InputType.Text" @bind-Value="role.Name" ValidateOnInput="true" />
-        <BSFeedback For="@(() => role.Name)" ValidMessage="" />
+        <BSLabel>Code</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="role.Code" ValidateOnInput="true" />
+        <BSFeedback For="@(() => role.Code)" ValidMessage="" />
     </BSCol>
     <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Last name</BSLabel>
-        <BSInput InputType="InputType.Text" @bind-Value="role.LastName" />
-        <BSFeedback For="@(() => role.LastName)" ValidMessage="" />
-    </BSCol>
-    <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Email Address</BSLabel>
-        <BSInput InputType="InputType.Email" @bind-Value="role.Email" placeholder="Email Address" />
-        <BSFeedback For="@(() => role.Email)" ValidMessage="" />
-    </BSCol>
-    <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Phone</BSLabel>
-        <BSInput InputType="InputType.Tel" @bind-Value="role.Phone" placeholder="Phone" />
-        <BSFeedback For="@(() => role.Phone)" ValidMessage="" />
-    </BSCol>
-    <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Username</BSLabel>
-        <BSInput InputType="InputType.Text" IsDisabled="disabled" @bind-Value="role.UserName" placeholder="Username" />
-        <BSFeedback For="@(() => role.UserName)" ValidMessage="" />
-    </BSCol>
-    <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Password</BSLabel>
-        <BSInput InputType="InputType.Password" IsDisabled="disabled" @bind-Value="role.Password" placeholder="Email Address" />
-        <BSFeedback For="@(() => role.Password)" ValidMessage="" />
+        <BSLabel>Description</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="role.Description" />
+        <BSFeedback For="@(() => role.Description)" ValidMessage="" />
     </BSCol>
 
-    <AuthorizeView Roles="ADM">
-        <Authorized>
-            <BSLabel>Role</BSLabel>
-            <BSInput InputType="InputType.Select" @bind-Value="_value">
-                @foreach (var rolex in roles)
-                {
-                    <option value="@rolex.Id">@rolex.Code</option>
-                }
-            </BSInput>
-        </Authorized>
-    </AuthorizeView>
-
-
-    <AuthorizeView Roles="ADM, MAN">
-        <Authorized>
-            <BSCol Column="12">
+    <BSCol Column="12">
+        <AuthorizeView Roles="ADM, MAN">
+            <Authorized>
                 <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
                 <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
-            </BSCol>
-        </Authorized>
-    </AuthorizeView>
+            </Authorized>
 
-    @{ if (disabled)
+        </AuthorizeView>
+
+        @{ if (disabled)
+            {
+                deleteMessage = $"Are you sure you want to delete role: {role.Code}";
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <GenericModal Title="Delete User"
+                                      Text=@deleteMessage
+                                      ButtonText="Delete"
+                                      OnClose="OnDeleteDialogClose"
+                                      IsDisabled="!disabled"
+                                      OkButton="Yes"
+                                      CancelButton="No">
+                        </GenericModal>
+                    </Authorized>
+                </AuthorizeView>
+            }
+        }
+    </BSCol>
+</BSForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    Role role = new Role();
+    private string _message = "";
+    bool disabled = false;
+    List<Role> roles = new List<Role>();
+    private int? _value;
+    private string deleteMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
         {
-            <AuthorizeView Roles="ADM">
-                <Authorized>
-                    <BSCol Column="12">
-                        <BSButton Color="BSColor.Primary" IsDisabled="!disabled" @onclick="OpenDeleteModal">Delete User</BSButton>
-                    </BSCol>
-                </Authorized>
-            </AuthorizeView>
+            disabled = true;
+            var res = await RoleService.GetById(id);
+            role = res.Respuesta;
+            if (role.Id > 0)
+            {
+                _value = role.Id;
+            }
 
         }
+
+        var resRoles = await RoleService.GetAll();
+        roles = resRoles.Respuesta.ToList();
     }
 
-    @code {
-
-        [Parameter]
-        public int id { get; set; }
-        Role role = new Role();
-        private string _message = "";
-        bool disabled = false;
-        List<Role> roles = new List<Role>();
-        private int? _value;
-
-        protected override async Task OnInitializedAsync()
-        {
-            if (id > 0)
-            {
-                disabled = true;
-                var res = await UserService.GetUserById(id);
-                if (role.Id > 0)
-                {
-                    _value = role.Id;
-                }
-
-            }
-
-            var resRoles = await RoleService.GetAllRoles();
-            roles = resRoles.Respuesta.ToList();
-        }
-
-        private async Task SaveUser(EditContext e)
-        {
-            if (e.Validate())
-            {
-                try
-                {
-                    var resultado = await RoleService.AddRole(role);
-
-                    if (resultado.ResultadoOperacion)
-                    {
-                        Reset();
-                        _message = "User added or updated successfully";
-                    }
-                    else
-                    {
-                        _message = resultado.Mensaje;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _message = "Something went wrong... " + ex.Message;
-                }
-            }
-        }
-
-        public void Reset()
-        {
-            role = new Role();
-        }
-
-        public async Task OpenDeleteModal()
+    private async Task SaveUser(EditContext e)
+    {
+        if (e.Validate())
         {
             try
             {
-                var resultado = await RoleService.DeleteRole(id);
+                var resultado = await RoleService.Add(role);
 
                 if (resultado.ResultadoOperacion)
                 {
                     Reset();
-                    _message = "User deleted successfully";
-                    NavigationManager.NavigateTo("/userdetails");
+                    _message = "Role added or updated successfully";
+                    disabled = false;
+                    NavigationManager.NavigateTo("/roledetails");
                 }
                 else
                 {
@@ -153,5 +100,44 @@
                 _message = "Something went wrong... " + ex.Message;
             }
         }
+    }
 
-    }*@
+    public void Reset()
+    {
+        role = new Role();
+    }
+
+    public async Task DeleteRole()
+    {
+        try
+        {
+            var resultado = await RoleService.Delete(id);
+
+            if (resultado.ResultadoOperacion)
+            {
+                Reset();
+                _message = "Role deleted successfully";
+                NavigationManager.NavigateTo("/roledetails");
+            }
+            else
+            {
+                _message = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = "Something went wrong... " + ex.Message;
+        }
+    }
+
+    private async Task OnDeleteDialogClose(bool accepted)
+    {
+        if (accepted)
+        {
+            await DeleteRole();
+        }
+        StateHasChanged();
+    }
+
+
+}

@@ -19,7 +19,7 @@ namespace GeneralDynamics.AI.Services
             _genericService = genericService;
         }
 
-        public async Task<Resultado<IEnumerable<Role>>> GetAllRoles()
+        public async Task<Resultado<IEnumerable<Role>>> GetAll()
         {
             var resultado = new Resultado<IEnumerable<Role>>(true);
             try
@@ -36,7 +36,7 @@ namespace GeneralDynamics.AI.Services
 
         }
 
-        public async Task<Resultado<Role>> GetRoleById(int id)
+        public async Task<Resultado<Role>> GetById(int id)
         {
             var resultado = new Resultado<Role>(true);
             try
@@ -52,7 +52,7 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> AddRole(Role role)
+        public async Task<Resultado> Add(Role role)
         {
             var resultado = new Resultado(true);
             try
@@ -69,7 +69,7 @@ namespace GeneralDynamics.AI.Services
             return resultado;
         }
 
-        public async Task<Resultado> DeleteRole(int id)
+        public async Task<Resultado> Delete(int id)
         {
             var resultado = new Resultado(true);
             try

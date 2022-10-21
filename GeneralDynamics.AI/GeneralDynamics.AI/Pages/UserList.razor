@@ -61,7 +61,7 @@ else
     {
         try
         {
-            var res = await UserService.GetAllUsers();
+            var res = await UserService.GetAll();
             _model = res.Respuesta.ToList();
         }
         catch (Exception e)

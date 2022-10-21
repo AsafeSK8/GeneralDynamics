@@ -10,10 +10,10 @@ namespace GeneralDynamics.AI.Services
 {
     public interface IRoleService
     {
-        Task<Resultado<IEnumerable<Role>>> GetAllRoles();
-        Task<Resultado<Role>> GetRoleById(int id);
-        Task<Resultado> AddRole(Role role);
-        Task<Resultado> DeleteRole(int id);
+        Task<Resultado<IEnumerable<Role>>> GetAll();
+        Task<Resultado<Role>> GetById(int id);
+        Task<Resultado> Add(Role role);
+        Task<Resultado> Delete(int id);
 
     }
 }

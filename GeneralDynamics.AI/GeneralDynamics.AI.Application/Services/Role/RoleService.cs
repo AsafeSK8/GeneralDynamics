@@ -1,5 +1,6 @@
 ﻿using GeneralDynamics.AI.Data;
 using GeneralDynamics.AI.Data.Repository;
+using GeneralDynamics.AI.Transversal.Factorias;
 using GeneralDynamics.AI.Transversal.Mensajes;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace GeneralDynamics.AI.Application.Services
                 if (role != null)
                 {
                     // Comprobamos si existe rol con el mismo código, en el caso de que si cancelamos la operación
-                    var existingRol = await _repository.Get(x => x.Code == role.Code);
+                    var existingRol = await _repository.Get(x => x.Id == role.Id);
 
                     if (existingRol.Any() && role.Id <= 0)
                     {
@@ -183,10 +184,25 @@ namespace GeneralDynamics.AI.Application.Services
                 {
                     resultado.ResultadoOperacion = false;
                     resultado.Mensaje = "Select at least one Role to remove";
+                    resultado.Mensajes = null;
                     return resultado;
                 }
 
-                var role = await _repository.GetById(id);
+                // Comprobamos si existen usuarios con este rol
+                using(IRepository<User> userRepository = FactoryManager.GetInstance<IRepository<User>>())
+                {
+                    var user = await userRepository.Get(x => x.RoleId == id);
+
+                    if(user.Any() && user.Count() > 0)
+                    {
+                        resultado.ResultadoOperacion = false;
+                        resultado.Mensaje = "This Role is currently assigned to one or more Users";
+                        resultado.Mensajes = null;
+                        return resultado;
+                    }
+                }
+
+                    var role = await _repository.GetById(id);
 
                 if (role != null)
                 {
@@ -196,12 +212,14 @@ namespace GeneralDynamics.AI.Application.Services
                 {
                     resultado.ResultadoOperacion = false;
                     resultado.Mensaje = "Select at least one Role to remove";
+                    resultado.Mensajes = null;
                 }
             }
             catch (Exception e)
             {
                 resultado.ResultadoOperacion = false;
                 resultado.Mensaje = e.Message;
+                resultado.Mensajes = null;
             }
 
             return resultado;

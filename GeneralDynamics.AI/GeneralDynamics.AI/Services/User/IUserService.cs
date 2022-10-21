@@ -10,9 +10,9 @@ namespace GeneralDynamics.AI.Services
 {
     public interface IUserService
     {
-        Task<Resultado<IEnumerable<User>>> GetAllUsers();
-        Task<Resultado<User>> GetUserById(int id);
-        Task<Resultado> AddUser(User user);
-        Task<Resultado> DeleteUser(int id);
+        Task<Resultado<IEnumerable<User>>> GetAll();
+        Task<Resultado<User>> GetById(int id);
+        Task<Resultado> Add(User user);
+        Task<Resultado> Delete(int id);
     }
 }
