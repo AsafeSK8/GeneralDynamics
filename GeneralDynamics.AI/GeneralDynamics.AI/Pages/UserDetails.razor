@@ -1,6 +1,7 @@
 ﻿@page "/userdetails"
 @page "/userdetails/{id:int}"
 @using System.ComponentModel.DataAnnotations
+@using GeneralDynamics.AI.Pages
 
 
 
@@ -65,14 +66,14 @@
 
     @{ if (disabled)
         {
+            deleteMessage = $"Are you sure you want to delete user: {user.UserName}";
             <AuthorizeView Roles="ADM">
                 <Authorized>
                     <BSCol Column="12">
-                        <BSButton Color="BSColor.Primary" IsDisabled="!disabled" @onclick="OpenDeleteModal" >Delete User</BSButton>
+                        <GenericModal Title="Delete User" Text=@deleteMessage ButtonText="Delete" OnClose="OnDeleteDialogClose" IsDisabled="!disabled"></GenericModal>
                     </BSCol>
                 </Authorized>
             </AuthorizeView>
-
         }
     }
 
@@ -89,6 +90,7 @@
     bool disabled = false;
     List<Role> roles = new List<Role>();
     private int? _value;
+    private string deleteMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,7 +141,7 @@
         user = new User();
     }
 
-    public async Task OpenDeleteModal()
+    public async Task DeleteUser()
     {
         try
         {
@@ -160,6 +162,15 @@
         {
             _message = "Something went wrong... " + ex.Message;
         }
+    }
+
+    private async Task OnDeleteDialogClose(bool accepted)
+    {
+        if (accepted)
+        {
+            await DeleteUser();
+        }
+        StateHasChanged();
     }
 
 }
