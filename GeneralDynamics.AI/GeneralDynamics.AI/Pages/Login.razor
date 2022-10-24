@@ -1,5 +1,8 @@
 ﻿@layout LoginLayout
 @page "/login"
+@inject IBlazorStrap _blazorStrap
+
+<BSToaster />
 
 <AuthorizeView>
     <Authorized>
@@ -19,11 +22,6 @@
 
                     <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
                     <BSCard CardType="CardType.Text">
-
-                        <BSCol Position="Position.Relative" ColumnMedium="12">
-                            @_message
-                            <BSValidationSummary />
-                        </BSCol>
 
                         <BSCol Position="Position.Relative" ColumnMedium="12">
                             <BSLabel>Username</BSLabel>
@@ -48,7 +46,7 @@
         </BSCard>
 
     </NotAuthorized>
-    
+
 </AuthorizeView>
 
 
@@ -58,6 +56,11 @@
     private UserLogin userlogin;
     private string _message = "";
     private string token = "";
+
+    // Toast parameters
+    private Toast ToastPlacement { get; set; } = Toast.TopRight;
+    private BSColor Color { get; set; }
+    private int Time { get; set; } = 3000;
 
     protected override Task OnInitializedAsync()
     {
@@ -91,12 +94,14 @@
                 else
                 {
                     _message = resultado.Mensaje;
+                    ShowErrorToast();
                 }
 
             }
             catch (Exception ex)
             {
                 _message = "Something went wrong... " + ex.Message;
+                ShowErrorToast();
             }
 
         }
@@ -106,6 +111,26 @@
     private void signIn()
     {
         NavigationManager.NavigateTo("/signIn");
+    }
+
+    private void ShowSuccessToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
+    }
+
+    private void ShowErrorToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Danger;
+            o.CloseAfter = Time;
+            o.Toast = Toast.TopCenter;
+        });
     }
 
 }

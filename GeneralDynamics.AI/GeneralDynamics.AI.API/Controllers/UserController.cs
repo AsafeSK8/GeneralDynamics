@@ -110,7 +110,6 @@ namespace GeneralDynamics.AI.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        // [Route("roles")]
         public async Task<IActionResult> RemoveUser(int id)
         {
             if (id <= 0)
