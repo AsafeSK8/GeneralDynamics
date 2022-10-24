@@ -1,0 +1,195 @@
+﻿@inject IBlazorStrap _blazorStrap
+
+<BSToaster />
+
+<BSForm Model="@user" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveUser" OnReset="Reset">
+
+    <DataAnnotationsValidator />
+
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>First name</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="user.Name" ValidateOnInput="true" />
+        <BSFeedback For="@(() => user.Name)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Last name</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="user.LastName" />
+        <BSFeedback For="@(() => user.LastName)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Email Address</BSLabel>
+        <BSInput InputType="InputType.Email" @bind-Value="user.Email" placeholder="Email Address" />
+        <BSFeedback For="@(() => user.Email)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Phone</BSLabel>
+        <BSInput InputType="InputType.Tel" @bind-Value="user.Phone" placeholder="Phone" />
+        <BSFeedback For="@(() => user.Phone)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Username</BSLabel>
+        <BSInput InputType="InputType.Text" IsDisabled="disabled" @bind-Value="user.UserName" placeholder="Username" />
+        <BSFeedback For="@(() => user.UserName)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Password</BSLabel>
+        <BSInput InputType="InputType.Password" IsDisabled="disabled" @bind-Value="user.Password" placeholder="Email Address" />
+        <BSFeedback For="@(() => user.Password)" ValidMessage="" />
+    </BSCol>
+
+    <AuthorizeView Roles="ADM">
+        <Authorized>
+            <BSLabel>Role</BSLabel>
+            <BSInput InputType="InputType.Select" @bind-Value="_value">
+                @foreach (var rolex in roles)
+                {
+                    <option value="@rolex.Id">@rolex.Code</option>
+                }
+            </BSInput>
+        </Authorized>
+    </AuthorizeView>
+
+    <BSCol Column="12">
+        <AuthorizeView Roles="ADM, MAN">
+            <Authorized>
+                <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
+                <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
+            </Authorized>
+
+        </AuthorizeView>
+
+        @{ if (disabled)
+            {
+                deleteMessage = $"Are you sure you want to delete user: {user.UserName}";
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <GenericModal Title="Delete User"
+                                      Text=@deleteMessage
+                                      ButtonText="Delete"
+                                      OnClose="OnDeleteDialogClose"
+                                      IsDisabled="!disabled"
+                                      OkButton="Yes"
+                                      CancelButton="No">
+                        </GenericModal>
+                    </Authorized>
+                </AuthorizeView>
+            }
+        }
+    </BSCol>
+
+</BSForm>
+
+
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+    User user = new User();
+    private string _message = "";
+    bool disabled = false;
+    List<Role> roles = new List<Role>();
+    private int? _value;
+    private string deleteMessage;
+
+    // Toast parameters
+    private Toast ToastPlacement { get; set; } = Toast.TopRight;
+    private BSColor Color { get; set; }
+    private int Time { get; set; } = 3000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            disabled = true;
+            var res = await UserService.GetById(id);
+            user = res.Respuesta;
+            if (user.RoleId != null)
+            {
+                _value = user.RoleId;
+            }
+
+        }
+
+        var resRoles = await RoleService.GetAll();
+        roles = resRoles.Respuesta.ToList();
+    }
+
+    private async Task SaveUser(EditContext e)
+    {
+        if (e.Validate())
+        {
+            try
+            {
+                user.RoleId = _value;
+                var resultado = await UserService.Add(user);
+
+                if (resultado.ResultadoOperacion)
+                {
+                    Reset();
+                    _message = "User added or updated successfully";
+                    ShowToast();
+                    disabled = false;
+                    NavigationManager.NavigateTo("/userdetails");
+                }
+                else
+                {
+                    _message = resultado.Mensaje;
+                }
+            }
+            catch (Exception ex)
+            {
+                _message = "Something went wrong... " + ex.Message;
+            }
+        }
+    }
+
+    public void Reset()
+    {
+        user = new User();
+    }
+
+    public async Task DeleteUser()
+    {
+        try
+        {
+            var resultado = await UserService.Delete(id);
+
+            if (resultado.ResultadoOperacion)
+            {
+                Reset();
+                _message = "User deleted successfully";
+                ShowToast();
+                NavigationManager.NavigateTo("/userdetails");
+            }
+            else
+            {
+                _message = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = "Something went wrong... " + ex.Message;
+        }
+    }
+
+    private async Task OnDeleteDialogClose(bool accepted)
+    {
+        if (accepted)
+        {
+            await DeleteUser();
+        }
+        StateHasChanged();
+    }
+
+    private void ShowToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
+    }
+
+}

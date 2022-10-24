@@ -46,7 +46,7 @@ namespace GeneralDynamics.AI.API.Controllers
 
         // Authorization test
         [HttpGet("currentuser")]
-        [Authorize(Roles = "ADM, USER")]
+        [Authorize(Roles = "ADM, USER, MAN")]
         public IActionResult GetCurrentUser()
         {
             var currentUser = _sessionService.GetCurrentUser(HttpContext);

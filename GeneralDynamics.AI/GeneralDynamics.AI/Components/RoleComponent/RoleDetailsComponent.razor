@@ -1,0 +1,157 @@
+﻿@inject IBlazorStrap _blazorStrap
+
+<BSToaster />
+
+<BSForm Model="@role" IsRow="true" Gutters="Gutters.Medium" OnSubmit="SaveRole" OnReset="Reset">
+    <DataAnnotationsValidator />
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Code</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="role.Code" ValidateOnInput="true" />
+        <BSFeedback For="@(() => role.Code)" ValidMessage="" />
+    </BSCol>
+    <BSCol Position="Position.Relative" ColumnMedium="4">
+        <BSLabel>Description</BSLabel>
+        <BSInput InputType="InputType.Text" @bind-Value="role.Description" />
+        <BSFeedback For="@(() => role.Description)" ValidMessage="" />
+    </BSCol>
+
+    <BSCol Column="12">
+        <AuthorizeView Roles="ADM, MAN">
+            <Authorized>
+                <BSButton Color="BSColor.Primary" IsSubmit="true">Submit</BSButton>
+                <BSButton Color="BSColor.Primary" IsReset="true" @onclick="Reset">Reset</BSButton>
+            </Authorized>
+
+        </AuthorizeView>
+
+        @{ if (disabled)
+            {
+                deleteMessage = $"Are you sure you want to delete role: {role.Code}";
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <GenericModal Title="Delete User"
+                                      Text=@deleteMessage
+                                      ButtonText="Delete"
+                                      OnClose="OnDeleteDialogClose"
+                                      IsDisabled="!disabled"
+                                      OkButton="Yes"
+                                      CancelButton="No">
+                        </GenericModal>
+                    </Authorized>
+                </AuthorizeView>
+            }
+        }
+    </BSCol>
+</BSForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    Role role = new Role();
+    private string _message = "";
+    bool disabled = false;
+    List<Role> roles = new List<Role>();
+    private int? _value;
+    private string deleteMessage;
+
+    // Toast parameters
+    private Toast ToastPlacement { get; set; } = Toast.TopRight;
+    private BSColor Color { get; set; }
+    private int Time { get; set; } = 3000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (id > 0)
+        {
+            disabled = true;
+            var res = await RoleService.GetById(id);
+            role = res.Respuesta;
+            if (role.Id > 0)
+            {
+                _value = role.Id;
+            }
+
+        }
+
+        var resRoles = await RoleService.GetAll();
+        roles = resRoles.Respuesta.ToList();
+    }
+
+    private async Task SaveRole(EditContext e)
+    {
+        if (e.Validate())
+        {
+            try
+            {
+                var resultado = await RoleService.Add(role);
+
+                if (resultado.ResultadoOperacion)
+                {
+                    Reset();
+                    _message = "Role added or updated successfully";
+                    ShowToast();
+                    disabled = false;
+                    NavigationManager.NavigateTo("/roledetails");
+                }
+                else
+                {
+                    _message = resultado.Mensaje;
+                }
+            }
+            catch (Exception ex)
+            {
+                _message = "Something went wrong... " + ex.Message;
+            }
+        }
+    }
+
+    public void Reset()
+    {
+        role = new Role();
+    }
+
+    public async Task DeleteRole()
+    {
+        try
+        {
+            var resultado = await RoleService.Delete(id);
+
+            if (resultado.ResultadoOperacion)
+            {
+                Reset();
+                _message = "Role deleted successfully";
+                ShowToast();
+                NavigationManager.NavigateTo("/roledetails");
+            }
+            else
+            {
+                _message = resultado.Mensaje;
+            }
+        }
+        catch (Exception ex)
+        {
+            _message = "Something went wrong... " + ex.Message;
+        }
+    }
+
+    private async Task OnDeleteDialogClose(bool accepted)
+    {
+        if (accepted)
+        {
+            await DeleteRole();
+        }
+        StateHasChanged();
+    }
+
+    private void ShowToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
+    }
+
+
+}

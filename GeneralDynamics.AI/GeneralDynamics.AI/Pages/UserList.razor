@@ -1,102 +1,11 @@
 ﻿@page "/userlist"
 
-@if (_model == null)
-{
-    <div class="centerMiddleInsideNav">
-        <BSSpinner Size="Size.Large"/>
-    </div>
-}
-else
-{
+<AuthorizeView Roles="ADM, MAN">
+    <Authorized>
+        <GeneralDynamics.AI.Components.UserComponent.UserListComponent></GeneralDynamics.AI.Components.UserComponent.UserListComponent>
+    </Authorized>
+</AuthorizeView>
 
-    <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
-        <Header>
-            <AuthorizeView Roles="ADM">
-                <Authorized>
-                    <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.Id))"></BSDataTableHead>
-                </Authorized>
-            </AuthorizeView>
-            <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.UserName))" ColumnFilter="true">Username</BSDataTableHead>
-            <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.Name))" ColumnFilter="true">Name</BSDataTableHead>
-            <BSDataTableHead TValue="User" Sortable="true" Column="@(nameof(User.Email))" ColumnFilter="true">Email</BSDataTableHead>
-            <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.LastName))">Last Name</BSDataTableHead>
-            <BSDataTableHead TValue="User" Sortable="false" Column="@(nameof(User.Phone))">Phone</BSDataTableHead>
-        </Header>
-        <Body>
-            <BSDataTableRow>
-                <AuthorizeView Roles="ADM">
-                    <Authorized>
-                        <BSTD @onclick="@(() => EditUser(@item.Id))">
-                            <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
-                        </BSTD>
-                    </Authorized>
-                </AuthorizeView>
+@code{
 
-                <BSTD>
-                    @item.UserName
-                </BSTD>
-                <BSTD>
-                    @item.Name
-                </BSTD>
-                <BSTD>
-                    @item.Email
-                </BSTD>
-                <BSTD>
-                    @item.LastName
-                </BSTD>
-                <BSTD>
-                    @item.Phone
-                </BSTD>
-            </BSDataTableRow>
-        </Body>
-    </BSDataTable>
-}
-
-
-
-@code {
-
-    private readonly int _startPage = 1;
-    private IEnumerable<User> _model { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        try
-        {
-            var res = await UserService.GetAll();
-            _model = res.Respuesta.ToList();
-        }
-        catch (Exception e)
-        {
-            var message = e.Message;
-        }
-    }
-
-    protected void EditUser(int id)
-    {
-        NavigationManager.NavigateTo($"/userdetails/{id}");
-    }
-
-    private async Task<(IEnumerable<User>, int)> FetchItems(DataRequest dataRequest)
-    {
-        var count = _model.Count();
-        if (dataRequest.FilterColumnProperty != null && dataRequest.Filter != null)
-        {
-            var data = _model.Where(q =>
-                (q.UserName.ToLower().Contains(dataRequest.Filter) && nameof(q.UserName) == dataRequest.FilterColumn) ||
-                (q.Name.ToLower().Contains(dataRequest.Filter) && nameof(q.Name) == dataRequest.FilterColumn) ||
-                (q.Email.ToLower().Contains(dataRequest.Filter) && nameof(q.Email) == dataRequest.FilterColumn)
-                ).ToList();
-            count = data.Count();
-            return await Task.FromResult((data.Skip(dataRequest.Page * 5).Take(5), count));
-        }
-
-        if (dataRequest.SortColumnProperty != null)
-        {
-            if (dataRequest.Descending)
-                return (_model.OrderByDescending(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
-            return (_model.OrderBy(x => dataRequest.SortColumnProperty.GetValue(x)).Skip(dataRequest.Page * 5).Take(5).ToList(), count);
-        }
-        return await Task.FromResult((_model.Skip(dataRequest.Page * 5).Take(5), count));
-    }
 }
