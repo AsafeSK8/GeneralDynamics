@@ -31,11 +31,22 @@
         <BSInput InputType="InputType.Text" IsDisabled="disabled" @bind-Value="user.UserName" placeholder="Username" />
         <BSFeedback For="@(() => user.UserName)" ValidMessage="" />
     </BSCol>
-    <BSCol Position="Position.Relative" ColumnMedium="4">
-        <BSLabel>Password</BSLabel>
-        <BSInput InputType="InputType.Password" IsDisabled="disabled" @bind-Value="user.Password" placeholder="Email Address" />
-        <BSFeedback For="@(() => user.Password)" ValidMessage="" />
-    </BSCol>
+
+    @*
+        !!THIS OPTION IS FOR DEMO PURPOSES ONLY!!
+
+        User Passwords should be only updated via 
+        some kind of password recovery.
+    *@
+    <AuthorizeView Roles="ADM">
+        <Authorized>
+            <BSCol Position="Position.Relative" ColumnMedium="4">
+                <BSLabel>Password</BSLabel>
+                <BSInput InputType="InputType.Password" @bind-Value="user.PasswordValidationInput" placeholder="Password" />
+                <BSFeedback For="@(() => user.PasswordValidationInput)" ValidMessage="" />
+            </BSCol>
+        </Authorized>
+    </AuthorizeView>
 
     <AuthorizeView Roles="ADM">
         <Authorized>

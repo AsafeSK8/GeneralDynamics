@@ -73,6 +73,7 @@ namespace GeneralDynamics.AI.Services
             var resultado = new Resultado(true);
             try
             {
+                user.Password = user.PasswordValidationInput;
                 resultado = await _genericService.Post<Resultado>($"api/user", user);
 
             }

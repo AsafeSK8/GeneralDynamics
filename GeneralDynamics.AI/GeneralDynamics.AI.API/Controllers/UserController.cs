@@ -3,6 +3,7 @@ using GeneralDynamics.AI.Data;
 using GeneralDynamics.AI.Data.Repository;
 using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Transversal.Factorias;
+using GeneralDynamics.AI.Transversal.Mensajes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -75,7 +76,12 @@ namespace GeneralDynamics.AI.API.Controllers
             }
 
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                Resultado res = new Resultado(false);
+                res.Mensaje = "Missing fields!";
+                return BadRequest(res);
+            }
+                
 
             var data = await _userService.AddUser(user);
 

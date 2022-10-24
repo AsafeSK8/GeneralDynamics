@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using BC = BCrypt.Net.BCrypt;
 
 namespace GeneralDynamics.AI.Application.Services
 {
@@ -41,14 +42,18 @@ namespace GeneralDynamics.AI.Application.Services
 
                     var userToModify = existingUser.FirstOrDefault();
 
-                    if(userToModify != null && userToModify.Id > 0)
+                    string passwordHash = BC.HashPassword(user.Password);
+
+                    user.Password = passwordHash;
+
+                    if (userToModify != null && userToModify.Id > 0)
                     {
                         userToModify.Name = user.Name;
                         userToModify.LastName = user.LastName;
                         userToModify.Phone = user.Phone;
                         userToModify.Email = user.Email;
                         userToModify.RoleId = user.RoleId;
-
+                        userToModify.Password = passwordHash;
                         await _repository.Update(userToModify);
                         return resultado;
                     }

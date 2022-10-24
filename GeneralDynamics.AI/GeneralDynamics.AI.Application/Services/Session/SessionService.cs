@@ -14,6 +14,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using BC = BCrypt.Net.BCrypt;
 
 namespace GeneralDynamics.AI.Application.Services
 {
@@ -32,7 +33,7 @@ namespace GeneralDynamics.AI.Application.Services
         {
             Resultado<UserDTO> resultado = new Resultado<UserDTO>(true);
 
-            Expression<Func<User, bool>> expr = x => x.UserName == userLogin.Username && x.Password == userLogin.Password;
+            Expression<Func<User, bool>> expr = x => x.UserName == userLogin.Username;
 
             try
             {
@@ -40,7 +41,7 @@ namespace GeneralDynamics.AI.Application.Services
                 //var data = await _repository.FindOne(expr);
                 var data = await _repository.Get(expr, includeProperties: "Role");
 
-                if (data.Any())
+                if (data.Any() && BC.Verify(userLogin.Password, data.FirstOrDefault().Password))
                 {
                     resultado.Respuesta = FactoryManager.Map<User, UserDTO>(data.FirstOrDefault());
                 }
