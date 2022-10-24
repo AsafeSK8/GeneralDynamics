@@ -2,7 +2,9 @@
 
 @if (_model == null)
 {
-    <BSSpinner />
+    <div class="centerMiddleInsideNav">
+        <BSSpinner Size="Size.Large"/>
+    </div>
 }
 else
 {
@@ -88,8 +90,6 @@ else
             count = data.Count();
             return await Task.FromResult((data.Skip(dataRequest.Page * 5).Take(5), count));
         }
-
-        // TODO Implement pagination
 
         if (dataRequest.SortColumnProperty != null)
         {

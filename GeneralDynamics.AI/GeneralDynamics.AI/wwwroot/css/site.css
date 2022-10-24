@@ -77,6 +77,15 @@ a, .btn-link {
     height: 100px;
 }
 
+.centerMiddleInsideNav {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    /* optional size in px or %: */
+    width: 100px;
+    height: 100px;
+}
+
 .btnEdit {
     --bs-btn-padding-x: 0.75rem;
     --bs-btn-padding-y: 0.75rem;

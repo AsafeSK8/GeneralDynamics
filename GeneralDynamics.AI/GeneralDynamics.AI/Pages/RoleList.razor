@@ -2,39 +2,41 @@
 
 @if (_model == null)
 {
-    <BSSpinner />
+    <div class="centerMiddleInsideNav">
+        <BSSpinner Size="Size.Large" />
+    </div>
 }
 else
 {
 
-<AuthorizeView Roles="ADM">
+    <AuthorizeView Roles="ADM">
 
-    <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
-        <Header>
-            <BSDataTableHead TValue="Role" Sortable="false" Column="@(nameof(Role.Id))"></BSDataTableHead>
+        <BSDataTable FetchItems="FetchItems" PaginationBottom="true" StartPage="_startPage" RowsPerPage="5" Context="item">
+            <Header>
+                <BSDataTableHead TValue="Role" Sortable="false" Column="@(nameof(Role.Id))"></BSDataTableHead>
 
-            <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Code))" ColumnFilter="true">Code</BSDataTableHead>
-            <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Description))" ColumnFilter="true">Description</BSDataTableHead>
-        </Header>
-        <Body>
-            <BSDataTableRow>
-                <BSTD @onclick="@(() => EditRole(@item.Id))">
-                    <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
-                </BSTD>
+                <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Code))" ColumnFilter="true">Code</BSDataTableHead>
+                <BSDataTableHead TValue="Role" Sortable="true" Column="@(nameof(Role.Description))" ColumnFilter="true">Description</BSDataTableHead>
+            </Header>
+            <Body>
+                <BSDataTableRow>
+                    <BSTD @onclick="@(() => EditRole(@item.Id))">
+                        <BSButton Class="btnEdit" Color="BSColor.Info">Edit</BSButton>
+                    </BSTD>
 
-                <BSTD>
-                    @item.Code
-                </BSTD>
-                <BSTD>
-                    @item.Description
-                </BSTD>
-            </BSDataTableRow>
-        </Body>
-    </BSDataTable>
+                    <BSTD>
+                        @item.Code
+                    </BSTD>
+                    <BSTD>
+                        @item.Description
+                    </BSTD>
+                </BSDataTableRow>
+            </Body>
+        </BSDataTable>
 
-</AuthorizeView>
+    </AuthorizeView>
 
-    
+
 }
 
 @code {
@@ -72,8 +74,6 @@ else
             count = data.Count();
             return await Task.FromResult((data.Skip(dataRequest.Page * 5).Take(5), count));
         }
-
-        // TODO Implement pagination
 
         if (dataRequest.SortColumnProperty != null)
         {
