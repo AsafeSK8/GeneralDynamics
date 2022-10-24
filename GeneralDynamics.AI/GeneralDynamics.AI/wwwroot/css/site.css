@@ -1,6 +1,9 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -48,3 +51,42 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.center {
+    margin: auto;
+    width: 40%;
+    padding: 10px;
+}
+
+.login-btn {
+    margin-top: 10px;
+    width: -webkit-fill-available;
+}
+
+.centerMiddle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -moz-transform: translate(-50%, -50%); /* Firefox */
+    -ms-transform: translate(-50%, -50%); /* IE 9 */
+    -webkit-transform: translate(-50%, -50%); /* Safari and Chrome*/
+    -o-transform: translate(-50%, -50%); /* Opera */
+    transform: translate(-50%, -50%);
+    /* optional size in px or %: */
+    width: 100px;
+    height: 100px;
+}
+
+.centerMiddleInsideNav {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    /* optional size in px or %: */
+    width: 100px;
+    height: 100px;
+}
+
+.btnEdit {
+    --bs-btn-padding-x: 0.75rem;
+    --bs-btn-padding-y: 0.75rem;
+}

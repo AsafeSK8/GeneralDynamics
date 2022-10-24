@@ -6,5 +6,20 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using BlazorStrap
+@* References *@
 @using GeneralDynamics.AI
 @using GeneralDynamics.AI.Shared
+@using GeneralDynamics.AI.Model
+@using GeneralDynamics.AI.Data
+@using GeneralDynamics.AI.Services
+@using GeneralDynamics.AI.Transversal.Mensajes
+@* External Components *@
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@* Services *@
+@inject ISessionService SessionService
+@inject IUserService UserService
+@inject ITokenManagerService TokenManagerService
+@inject IRoleService RoleService

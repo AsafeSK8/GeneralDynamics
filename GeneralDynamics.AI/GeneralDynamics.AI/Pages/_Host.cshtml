@@ -12,12 +12,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GeneralDynamics.AI</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+
+    @*<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />*@
+
+    <link rel="stylesheet" href="https://bootswatch.com//5/lux/bootstrap.css" />
     <link href="css/site.css" rel="stylesheet" />
     <link href="GeneralDynamics.AI.styles.css" rel="stylesheet" />
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
+    <component type="typeof(App)" render-mode="Server" />
 
     <div id="blazor-error-ui">
         <environment include="Staging,Production">
@@ -26,10 +29,12 @@
         <environment include="Development">
             An unhandled exception has occurred. See browser dev tools for details.
         </environment>
-        <a href="" class="reload">Reload</a>
+        <a href="~/" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
 
     <script src="_framework/blazor.server.js"></script>
+    <script src="_content/BlazorStrap/popper.min.js"></script>
+    <script src="_content/BlazorStrap/blazorstrap.js"></script>
 </body>
 </html>

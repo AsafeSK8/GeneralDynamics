@@ -7,31 +7,63 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using BC = BCrypt.Net.BCrypt;
 
 namespace GeneralDynamics.AI.Application.Services
 {
-    public class RoleService : IRoleService
+    public class UserService : IUserService
     {
-        private readonly IRepository<Role> _repository;
-        public RoleService(IRepository<Role> repository)
+
+        private readonly IRepository<User> _repository;
+
+        public UserService(IRepository<User> repository)
         {
             _repository = repository;
         }
 
-        public async Task<Resultado> AddRole(Role role)
+        public async Task<Resultado> AddUser(User user)
         {
             Resultado resultado = new Resultado(true);
 
             try
             {
-                if (role != null)
+                if (user != null)
                 {
-                    await _repository.Add(role);
+                    // Comprobamos si existe usuario con el mismo username, en el caso de que si cancelamos la operación
+                    var existingUser = await _repository.Get(x => x.UserName == user.UserName);
+
+                    if (existingUser.Any() && user.Id <= 0)
+                    {
+                        resultado.ResultadoOperacion = false;
+                        resultado.Mensaje = "Username Already Exists";
+
+                        return resultado;
+                    }
+
+                    var userToModify = existingUser.FirstOrDefault();
+
+                    string passwordHash = BC.HashPassword(user.Password);
+
+                    user.Password = passwordHash;
+
+                    if (userToModify != null && userToModify.Id > 0)
+                    {
+                        userToModify.Name = user.Name;
+                        userToModify.LastName = user.LastName;
+                        userToModify.Phone = user.Phone;
+                        userToModify.Email = user.Email;
+                        userToModify.RoleId = user.RoleId;
+                        userToModify.Password = passwordHash;
+                        await _repository.Update(userToModify);
+                        return resultado;
+                    }
+
+                    await _repository.Add(user);
                 }
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Rol can not be empty";
+                    resultado.Mensaje = "User can not be empty";
                 }
             }
             catch (Exception e)
@@ -43,20 +75,20 @@ namespace GeneralDynamics.AI.Application.Services
             return resultado;
         }
 
-        public async Task<Resultado> AddRoles(IEnumerable<Role> roles)
+        public async Task<Resultado> AddUsers(IEnumerable<User> user)
         {
             Resultado resultado = new Resultado(true);
 
             try
             {
-                if (roles.ToList().Count > 0)
+                if (user.ToList().Count > 0)
                 {
-                    await _repository.AddRange(roles);
+                    await _repository.AddRange(user);
                 }
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Roles can not be empty";
+                    resultado.Mensaje = "Users can not be empty";
                 }
             }
             catch (Exception e)
@@ -68,9 +100,9 @@ namespace GeneralDynamics.AI.Application.Services
             return resultado;
         }
 
-        public async Task<Resultado<IEnumerable<Role>>> FindRoles(Expression<Func<Role, bool>> predicate)
+        public async Task<Resultado<IEnumerable<User>>> FindUsers(Expression<Func<User, bool>> predicate)
         {
-            Resultado<IEnumerable<Role>> resultado = new Resultado<IEnumerable<Role>>(true);
+            Resultado<IEnumerable<User>> resultado = new Resultado<IEnumerable<User>>(true);
 
             try
             {
@@ -83,7 +115,7 @@ namespace GeneralDynamics.AI.Application.Services
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "No Roles found";
+                    resultado.Mensaje = "No Users found";
                 }
 
             }
@@ -96,9 +128,9 @@ namespace GeneralDynamics.AI.Application.Services
             return resultado;
         }
 
-        public async Task<Resultado<IEnumerable<Role>>> GetAllRoles()
+        public async Task<Resultado<IEnumerable<User>>> GetAllUsers()
         {
-            Resultado<IEnumerable<Role>> resultado = new Resultado<IEnumerable<Role>>(true);
+            Resultado<IEnumerable<User>> resultado = new Resultado<IEnumerable<User>>(true);
 
             try
             {
@@ -107,13 +139,46 @@ namespace GeneralDynamics.AI.Application.Services
                 if (data.ToList().Count > 0)
                 {
                     resultado.Respuesta = data;
+                    resultado.Mensajes = null;
                 }
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "No Roles found";
+                    resultado.Mensaje = "No Users found";
+                    resultado.Mensajes = null;
                 }
 
+            }
+            catch (Exception e)
+            {
+                resultado.ResultadoOperacion = false;
+                resultado.Mensaje = e.Message;
+                resultado.Mensajes = null;
+            }
+
+            return resultado;
+        }
+
+        public async Task<Resultado<User>> GetUserById(int id)
+        {
+            Resultado<User> resultado = new Resultado<User>(true);
+
+            try
+            {
+                //var data = await _repository.GetById(id);
+
+                var userSet = await _repository.Get(x => x.Id == id, includeProperties: "Role");
+                var data = userSet.FirstOrDefault();
+
+                if (data != null)
+                {
+                    resultado.Respuesta = data;
+                }
+                else
+                {
+                    resultado.ResultadoOperacion = false;
+                    resultado.Mensaje = "User not found";
+                }
             }
             catch (Exception e)
             {
@@ -124,34 +189,7 @@ namespace GeneralDynamics.AI.Application.Services
             return resultado;
         }
 
-        public async Task<Resultado<Role>> GetRoleById(int id)
-        {
-            Resultado<Role> resultado = new Resultado<Role>(true);
-
-            try
-            {
-                var data = await _repository.Get(id);
-
-                if(data != null)
-                {
-                    resultado.Respuesta = data;
-                }
-                else
-                {
-                    resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Role not found";
-                }
-            }
-            catch(Exception e)
-            {
-                resultado.ResultadoOperacion = false;
-                resultado.Mensaje = e.Message;
-            }
-
-            return resultado;
-        }
-
-        public async Task<Resultado> RemoveRole(int id)
+        public async Task<Resultado> RemoveUser(int id)
         {
             Resultado resultado = new Resultado(true);
 
@@ -160,11 +198,11 @@ namespace GeneralDynamics.AI.Application.Services
                 if (id <= 0)
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Select at least one Role to remove";
+                    resultado.Mensaje = "Select at least one User to remove";
                     return resultado;
                 }
 
-                var role = await _repository.Get(id);
+                var role = await _repository.GetById(id);
 
                 if (role != null)
                 {
@@ -173,7 +211,7 @@ namespace GeneralDynamics.AI.Application.Services
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Select at least one Role to remove";
+                    resultado.Mensaje = "Select at least one User to remove";
                 }
             }
             catch (Exception e)
@@ -185,16 +223,16 @@ namespace GeneralDynamics.AI.Application.Services
             return resultado;
         }
 
-        public async Task<Resultado> RemoveRoles(IEnumerable<int> ids)
+        public async Task<Resultado> RemoveUsers(IEnumerable<int> ids)
         {
             Resultado resultado = new Resultado(true);
 
             try
             {
-                if(ids.ToList().Count <= 0)
+                if (ids.ToList().Count <= 0)
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Select at least one Role to remove";
+                    resultado.Mensaje = "Select at least one User to remove";
                     return resultado;
                 }
 
@@ -207,7 +245,7 @@ namespace GeneralDynamics.AI.Application.Services
                 else
                 {
                     resultado.ResultadoOperacion = false;
-                    resultado.Mensaje = "Could not find Roles";
+                    resultado.Mensaje = "Could not find Users";
                 }
             }
             catch (Exception e)

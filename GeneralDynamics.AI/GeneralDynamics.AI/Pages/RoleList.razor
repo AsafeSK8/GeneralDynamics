@@ -1,0 +1,11 @@
+﻿@page "/rolelist"
+
+<AuthorizeView Roles="ADM, MAN">
+    <Authorized>
+        <GeneralDynamics.AI.Components.RoleComponent.RoleListComponent></GeneralDynamics.AI.Components.RoleComponent.RoleListComponent>
+    </Authorized>
+</AuthorizeView>
+
+@code{
+
+}

@@ -1,11 +1,16 @@
 ﻿using GeneralDynamics.AI.Application.Services;
 using GeneralDynamics.AI.Data;
 using GeneralDynamics.AI.Data.Repository;
+using GeneralDynamics.AI.Model;
 using GeneralDynamics.AI.Transversal.Factorias;
+using GeneralDynamics.AI.Transversal.Mensajes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI.API.Controllers
@@ -16,6 +21,7 @@ namespace GeneralDynamics.AI.API.Controllers
 
         private readonly IRepository<User> _repository;
         private IUserService _userService = null;
+        private ISessionService _sessionService = null;
 
         [NonAction]
         public IActionResult Index()
@@ -27,14 +33,26 @@ namespace GeneralDynamics.AI.API.Controllers
         {
             _repository = repository;
             _userService = FactoryManager.GetInstance<IUserService>();
+            _sessionService = FactoryManager.GetInstance<ISessionService>();
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllUsers()
         {
             var data = await _userService.GetAllUsers();
 
             return Ok(data);
+        }
+
+        // Authorization test
+        [HttpGet("currentuser")]
+        [Authorize(Roles = "ADM, USER, MAN")]
+        public IActionResult GetCurrentUser()
+        {
+            var currentUser = _sessionService.GetCurrentUser(HttpContext);
+
+            return Ok(currentUser);
         }
 
         [HttpGet("{id}")]
@@ -58,7 +76,12 @@ namespace GeneralDynamics.AI.API.Controllers
             }
 
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            {
+                Resultado res = new Resultado(false);
+                res.Mensaje = "Missing fields!";
+                return BadRequest(res);
+            }
+                
 
             var data = await _userService.AddUser(user);
 
@@ -90,9 +113,6 @@ namespace GeneralDynamics.AI.API.Controllers
         // [Route("roles")]
         public async Task<IActionResult> RemoveUser(int id)
         {
-            //if (id == null)
-            //    return BadRequest();
-
             if (id <= 0)
             {
                 ModelState.AddModelError("User", "User shouldn't be empty");
@@ -125,7 +145,6 @@ namespace GeneralDynamics.AI.API.Controllers
 
             return Ok(data);
         }
-
 
     }
 }

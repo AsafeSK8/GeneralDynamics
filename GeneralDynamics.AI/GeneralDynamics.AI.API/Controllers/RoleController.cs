@@ -87,12 +87,8 @@ namespace GeneralDynamics.AI.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        // [Route("roles")]
         public async Task<IActionResult> RemoveRole(int id)
         {
-            //if (id == null)
-            //    return BadRequest();
-
             if (id <= 0)
             {
                 ModelState.AddModelError("Roles", "Roles shouldn't be empty");

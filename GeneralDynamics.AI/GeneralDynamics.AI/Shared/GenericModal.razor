@@ -1,0 +1,46 @@
+﻿<BSModal DataId="generic_modal" IsCentered="true">
+    <Header>@Title</Header>
+    <Content>@Text</Content>
+    <Footer Context="modal">
+        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="modal.HideAsync">@CancelButton</BSButton>
+        <BSButton Color="BSColor.Primary" OnClick="@(() => ModalOk(modal))">@OkButton</BSButton>
+    </Footer>
+</BSModal>
+<BSButton Color="BSColor.Primary" IsDisabled="@IsDisabled" Target="generic_modal">@ButtonText</BSButton>
+
+
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+    [Parameter]
+    public string ButtonText { get; set; }
+    [Parameter]
+    public string OkButton { get; set; } = "Confirm";
+    [Parameter]
+    public string CancelButton { get; set; } = "Close";
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    private Task ModalCancel()
+    {
+        return OnClose.InvokeAsync(false);
+    }
+
+    private Task ModalOk(BSModal modal)
+    {
+        modal.HideAsync();
+        return OnClose.InvokeAsync(true);
+    }
+
+    public void NavigateTo(string path)
+    {
+        NavigationManager.NavigateTo(path);
+    }
+
+}

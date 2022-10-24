@@ -1,0 +1,11 @@
+﻿@page "/userlist"
+
+<AuthorizeView Roles="ADM, MAN">
+    <Authorized>
+        <GeneralDynamics.AI.Components.UserComponent.UserListComponent></GeneralDynamics.AI.Components.UserComponent.UserListComponent>
+    </Authorized>
+</AuthorizeView>
+
+@code{
+
+}

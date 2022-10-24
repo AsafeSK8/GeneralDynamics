@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using GeneralDynamics.AI.Data;
+using GeneralDynamics.AI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,16 @@ namespace GeneralDynamics.AI.Application
         public AutoMapperProfileGD()
         {
 
-
+            CreateMap<User, UserDTO>()
+                .ForMember(x => x.Id, x => x.MapFrom(y => y.Id))
+                .ForMember(x => x.Name, x => x.MapFrom(y => y.Name))
+                .ForMember(x => x.LastName, x => x.MapFrom(y => y.LastName))
+                .ForMember(x => x.Email, x => x.MapFrom(y => y.Email))
+                .ForMember(x => x.Phone, x => x.MapFrom(y => y.Phone))
+                .ForMember(x => x.UserName, x => x.MapFrom(y => y.UserName))
+                .ForMember(x => x.RoleId, x => x.MapFrom(y => y.RoleId))
+                .ForMember(x => x.Role, x => x.MapFrom(y => y.Role.Code));
+                //.ForMember(X => X.RoleDTO, x => x.MapFrom(y => y.Role));
 
             //CreateMap<Seguro, SeguroRenovacionDTO>()
             //    .ForMember(x => x.Id, x => x.MapFrom(y => y.Id))

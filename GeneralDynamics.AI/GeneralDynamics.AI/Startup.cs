@@ -1,13 +1,24 @@
+using Blazored.LocalStorage;
+using BlazorStrap;
+using GeneralDynamics.AI.Data;
+using GeneralDynamics.AI.Handlers;
+using GeneralDynamics.AI.Services;
+using GeneralDynamics.AI.Services.Generic;
+using GeneralDynamics.AI.Transversal.Mensajes;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GeneralDynamics.AI
@@ -27,6 +38,22 @@ namespace GeneralDynamics.AI
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddBlazorStrap();
+            services.AddBlazoredLocalStorage();
+            services.AddTransient<ValidateHeaderHandler>();
+            services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            services.AddHttpClient<ITokenManagerService, TokenManagerService>();
+            services.AddHttpClient<ISessionService, SessionService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); });
+            services.AddHttpClient<IUserService, UserService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); })
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
+            services.AddHttpClient<IGenericService, GenericService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); })
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
+            services.AddHttpClient<IRoleService, RoleService>(
+                client => { client.BaseAddress = new Uri("https://localhost:44319"); })
+                .AddHttpMessageHandler<ValidateHeaderHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +74,9 @@ namespace GeneralDynamics.AI
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,0 +1,61 @@
+﻿
+@using GeneralDynamics.AI.Data
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">LEAPSOME</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        Home
+                        <span class="visually-hidden">(current)</span>
+                    </a>
+                </li>
+                <AuthorizeView Roles="ADM, MAN">
+                    <Authorized>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/userlist">Users</a>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="ADM">
+                    <Authorized>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/rolelist">Roles</a>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+
+
+            </ul>
+            <form class="d-flex">
+                <AuthorizeView>
+                    <Authorized>
+                        <button class="btn btn-secondary my-2 my-sm-0" @onclick="Logout" type="submit">Logout</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <button class="btn btn-secondary my-2 my-sm-0" @onclick="NavigateToLogin" type="submit">Login</button>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+            </form>
+        </div>
+    </div>
+</nav>
+
+@code {
+    public void Logout()
+    {
+        ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        NavigateToLogin();
+    }
+
+    public void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

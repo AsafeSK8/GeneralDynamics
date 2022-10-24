@@ -1,0 +1,16 @@
+﻿@page "/roledetails"
+@page "/roledetails/{id:int}"
+
+<AuthorizeView Roles="ADM">
+    <Authorized>
+        <GeneralDynamics.AI.Components.RoleComponent.RoleDetailsComponent id="id"></GeneralDynamics.AI.Components.RoleComponent.RoleDetailsComponent>
+    </Authorized>
+</AuthorizeView>
+
+
+@code{
+
+    [Parameter]
+    public int id { get; set; }
+
+}

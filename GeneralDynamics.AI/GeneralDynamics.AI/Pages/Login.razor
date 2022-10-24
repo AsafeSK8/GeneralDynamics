@@ -1,0 +1,111 @@
+﻿@layout LoginLayout
+@page "/login"
+
+<AuthorizeView>
+    <Authorized>
+        @{
+            NavigateToPath("/");
+        }
+    </Authorized>
+
+    <NotAuthorized>
+
+        <BSCard CardType="CardType.Card" style="width: 25rem;" class="center">
+            <BSCard CardType="CardType.Image" src="Images/login.jpg" alt="Card image cap" asp-append-version="true" />
+            <BSCard CardType="CardType.Body">
+
+                <BSForm Model="userlogin" IsRow="true" Gutters="Gutters.Medium" OnSubmit="login">
+                    <DataAnnotationsValidator />
+
+                    <BSCard CardType="CardType.Title" Class="center">Leapsome</BSCard>
+                    <BSCard CardType="CardType.Text">
+
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            @_message
+                            <BSValidationSummary />
+                        </BSCol>
+
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            <BSLabel>Username</BSLabel>
+                            <BSInput InputType="InputType.Text" @bind-Value="userlogin.Username" ValidateOnInput="true" />
+                            <BSFeedback For="@(() => userlogin.Username)" ValidMessage="" />
+                        </BSCol>
+
+                        <BSCol Position="Position.Relative" ColumnMedium="12">
+                            <BSLabel>Password</BSLabel>
+                            <BSInput InputType="InputType.Password" @bind-Value="userlogin.Password" ValidateOnInput="true" />
+                            <BSFeedback For="@(() => userlogin.Password)" ValidMessage="" />
+                        </BSCol>
+
+                    </BSCard>
+
+                    <BSButton Color="BSColor.Primary" IsSubmit="true" Class="login-btn">Login</BSButton>
+                    <BSButton Color="BSColor.Info" Class="login-btn" OnClick="signIn">Sign in</BSButton>
+
+                </BSForm>
+
+            </BSCard>
+        </BSCard>
+
+    </NotAuthorized>
+    
+</AuthorizeView>
+
+
+
+@code {
+
+    private UserLogin userlogin;
+    private string _message = "";
+    private string token = "";
+
+    protected override Task OnInitializedAsync()
+    {
+        userlogin = new UserLogin();
+        return base.OnInitializedAsync();
+    }
+
+    private void NavigateToPath(string path)
+    {
+        NavigationManager.NavigateTo(path);
+    }
+
+    private async Task login(EditContext e)
+    {
+        if (e.Validate())
+        {
+
+            try
+            {
+                var resultado = await SessionService.Login(userlogin);
+
+                if (resultado.ResultadoOperacion)
+                {
+                    token = resultado.Respuesta;
+
+                    await TokenManagerService.SaveToken("token", token);
+
+                    await ((AuthStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated("token");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    _message = resultado.Mensaje;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _message = "Something went wrong... " + ex.Message;
+            }
+
+        }
+
+    }
+
+    private void signIn()
+    {
+        NavigationManager.NavigateTo("/signIn");
+    }
+
+}
