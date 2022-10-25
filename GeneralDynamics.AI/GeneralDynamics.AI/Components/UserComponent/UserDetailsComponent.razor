@@ -146,11 +146,13 @@
                 else
                 {
                     _message = resultado.Mensaje;
+                    ShowErrorToast();
                 }
             }
             catch (Exception ex)
             {
                 _message = "Something went wrong... " + ex.Message;
+                ShowErrorToast();
             }
         }
     }
@@ -176,11 +178,13 @@
             else
             {
                 _message = resultado.Mensaje;
+                ShowErrorToast();
             }
         }
         catch (Exception ex)
         {
             _message = "Something went wrong... " + ex.Message;
+            ShowErrorToast();
         }
     }
 
@@ -198,6 +202,16 @@
         _blazorStrap.Toaster.Add(_message, o =>
         {
             o.Color = BSColor.Success;
+            o.CloseAfter = Time;
+            o.Toast = ToastPlacement;
+        });
+    }
+
+    private void ShowErrorToast()
+    {
+        _blazorStrap.Toaster.Add(_message, o =>
+        {
+            o.Color = BSColor.Danger;
             o.CloseAfter = Time;
             o.Toast = ToastPlacement;
         });
